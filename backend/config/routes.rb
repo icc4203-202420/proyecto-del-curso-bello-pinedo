@@ -23,8 +23,10 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :bars
       resources :beers
+      resources :events
       resources :users do
         resources :reviews, only: [:index]
+        resources :friendships, only: [:index, :create]
       end
       
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
