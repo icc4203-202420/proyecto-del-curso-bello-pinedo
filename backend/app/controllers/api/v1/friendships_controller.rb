@@ -1,20 +1,17 @@
 class API::V1::FriendshipsController < ApplicationController
+
+  include Authenticable
   before_action :set_user
+  before_action :verify_jwt_token
 
   def index
-    @friends = @user.friends
+    @friends = Friendship.where(user_id: @user.id)
     render json: @friends, status: :ok
   end
 
   def create
-    @friend = User.find_by(id: friendship_params[:friend_id])
-
-    if @friend && @user != @friend
-      @user.friends << @friend unless @user.friends.include?(@friend)
-      render json: { message: "Friend added successfully" }, status: :ok
-    else
-      render json: { error: "Invalid friend or self-friendship not allowed" }, status: :unprocessable_entity
-    end
+    @friendship = @user.friendships.build(friendship_params)
+    render json: @friendship, status: :ok if @friendship.save
   end
 
   private
@@ -24,6 +21,12 @@ class API::V1::FriendshipsController < ApplicationController
   end
 
   def friendship_params
-    params.require(:friendship).permit(:friend_id)
+    params.require(:friendship).permit(:friend_id, :bar_id)
   end
+
+  def verify_jwt_token
+    authenticate_user!
+    head :unauthorized unless current_user
+  end  
+  
 end
