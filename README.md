@@ -1,4 +1,3 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=15563203&assignment_repo_type=AssignmentRepo)
 # Proyecto de Aplicaciones Móviles - Enunciado General del Proyecto
 
 El proyecto del curso en este semestre consistirá en desarrollar una aplicación móvil para personas aficionadas a las cervezas, que frecuentan bares y eventos que se realizan en ellos. Los usuarios pueden evaluar cervezas y hacer amistades entre ellos. También pueden publicar fotos de los eventos a los que asisten en los bares, y etiquetarse.
@@ -111,11 +110,11 @@ Los requisitos funcionales de la aplicación que deberán desarrollar son los si
 5. Los usuario pueden buscar una cerveza en la aplicación (`Beer`), y ver los detalles de la cerveza, incluyendo qué cervecería la produce (`Brewery`), y qué bares la sirven.
 6. Los usuarios pueden escribir evaluaciones (ver modelo `Review` y tabla en `schema.rb`) de las cervezas, con rating y texto.
 7. Los usuarios pueden ver la evaluación global de una cerveza (rating promedio), junto con a su propia evaluación de la cerveza (si existe) y las evaluaciones de otros usuarios. 
-7. Los usuarios pueden asistir (hacer "_check-in_") en un evento (ver modelo `Attendance` y tabla en `schema.rb`), y ver todos los usuarios que también han hecho _check-in_.
-8. Los usuarios pueden subir fotografías a los eventos (ver modelo `EventPicture`). 
-9. Los usuarios pueden ver las fotos de un evento como una galería, con scrolling.
-10. Los usuarios pueden buscarse mutuamente en la aplicación usando _handle_, y agregarse como amigos (ver modelo `Friendship` y tabla en `schema.rb`), indicando el evento en donde se encontraron por primera vez opcionalmente.
-11. Los usuarios pueden etiquetarse en las fotos de un evento.
+8. Los usuarios pueden asistir (hacer "_check-in_") en un evento (ver modelo `Attendance` y tabla en `schema.rb`), y ver todos los usuarios que también han hecho _check-in_.
+9. Los usuarios pueden subir fotografías a los eventos (ver modelo `EventPicture`). 
+10. Los usuarios pueden ver las fotos de un evento como una galería, con scrolling.
+11. Los usuarios pueden buscarse mutuamente en la aplicación usando _handle_, y agregarse como amigos (ver modelo `Friendship` y tabla en `schema.rb`), indicando el evento en donde se encontraron por primera vez opcionalmente.
+12. Los usuarios pueden etiquetarse en las fotos de un evento.
 
 En las entregas sucesivas del proyecto se les irá solicitando completar funcionalidad relativa a los requisitos anteriores, y se les dará más detalle sobre las funciones específicas a implementar.
 
@@ -136,24 +135,24 @@ Antes de ejecutar la aplicación Rails por primera vez, es necesario crear una c
 Para iniciar la aplicación Rails por primera vez, ir al directorio `backend` en la consola y ejecutar los siguientes pasos:
 
 ```sh
-$ bundle install # verificar que las gemas queden instaladas correctamente
+bundle install # verificar que las gemas queden instaladas correctamente
 ```
 Luego, se debe crear un archivo de configuración encriptado para Rails, incluyendo la clave para los tokens JWT utilizados por devise-jwt. Para esto, asegurarse primero de eliminar archivos `config/credentials/*.yml.enc` si es que el repositorio los contiene.
 
 ```sh
-$ rm config/*.yml.enc
+rm config/*.yml.enc
 ```
 
 Luego, se necesita crear una clave para que devise-jwt y Warden generen tokens JWT válidos:
 
 ```sh
-$ rails runner "require 'securerandom'; puts SecureRandom.hex(64)"
+rails runner "require 'securerandom'; puts SecureRandom.hex(64)"
 ```
 
 Copiar la clave generada en la consola.
 
 ```sh
-$ EDITOR="nano" rails credentials:edit --environment test
+EDITOR="nano" rails credentials:edit --environment test
 ```
 
 Al final del archivo agregar una línea con el siguiente contenido:
@@ -164,18 +163,26 @@ devise_jwt_secret_key: [clave generada por comando anterior sin estos corchetes]
 
 Guardar el archivo y salir. Repetir cambiando la opción `--environment test` por `--environment development`. Si se va a realizar una instalación de producción, se debe también realizar este paso con el ambiente `production`.
 
+**Ejecutar las migraciones**
+
+Se debe ejecutar las migraciones y verificar que no haya errores.
+
+```sh
+rails db:migrate
+```
+
 **Ejecutar tests del backend Rails**
 
 Luego, es posible ejecutar los tests:
 
 ```sh
-$ bundle exec rspec # verificar que los tests pasen
+bundle exec rspec # verificar que los tests pasen
 ```
 
 **Iniciar la aplicación de backend Rails**
 
 ```sh
-$ rails s # iniciar la aplicación
+rails s # iniciar la aplicación
 ```
 
 Las siguientes ejecuciones de la aplicación sólo requieren levantar el sevidor Puma con el comando `rails s`.
@@ -185,9 +192,9 @@ Las siguientes ejecuciones de la aplicación sólo requieren levantar el sevidor
 Luego, para iniciar la aplicación React con Vite, se debe ir al directorio `www-frontend` en el repositorio y allí ejecutar:
 
 ```sh
-$ npm install -g yarn
-$ yarn install
-$ yarn dev
+npm install -g yarn
+yarn install
+yarn dev
 ```
 
 Se puede detener la aplicación con Ctrl+C. Basta `yarn dev` para volver a ejecutar.
@@ -199,43 +206,43 @@ En el directorio raíz de la aplicación hay un archivo de configuración `docke
 Con Docker Compose, se instalarán automáticamente todas las imágenes necesarias. Ejecutar el siguiente comando:
 
 ```sh
-$ docker-compose up
+docker-compose up
 ```
 
 Se pueden detener las aplicaciones con `Ctrl+C`. Así queda compose utilizando el terminal actual para mostrar la salida de los contenedores. También se puede desacoplar del terminal:
 
 ```sh
-$ docker-compose up -d
+docker-compose up -d
 ```
 
 En este modo desacoplado se pueden inspeccionar los logs con:
 
 ```sh
-$ docker logs -f
+docker logs -f
 ```
 
 Para detener las aplicaciones
 
 ```sh
-$ docker-compose down
+docker-compose down
 ```
 
 Si tienes aplicaciones docker compose concurrentes (p.ej., en otros cursos), es una buena idea usar proyectos para rotular las imágenes y que no haya choques entre proyectos distintos:
 
 ```sh
-$ docker-compose up -p appsmoviles -d
+docker-compose up -p appsmoviles -d
 ```
 
 En este último caso, para detener la aplicación se puede usar el mismo comando de arriba (down). Se puede pasar el nombre del proyecto por variable de entorno:
 
 ```sh
-$ COMPOSE_PROJECT_NAME=appsmoviles docker-compose down
+COMPOSE_PROJECT_NAME=appsmoviles docker-compose down
 ```
 
 Finalmente, hay situaciones en las que quedan contenedores huérfanos, por ejemplo, cuando hay caídas de contenedores. La forma de detener y eliminar contenedores huérfanos es a través del comando:
 
 ```sh
-$ docker-compose down --remove-orphans
+docker-compose down --remove-orphans
 ```
 
 ## Probar la API desde un cliente web
@@ -262,14 +269,14 @@ Los profesores del grupo continuarán trabajando sobre el repositorio con el có
 Para que los grupos puedan actualizar su repositorio con nuevos lanzamientos de código base, deben ejecutar los siguientes comandos su su repositorio local:
 
 ```sh
-$ git remote add upstream https://github.com/icc4203-202420/project-base
+git remote add upstream https://github.com/icc4203-202420/project-base
 ```
 
 Este comando permite agregar el repositorio de código base mantenido por los profesores del curso como otro origen remoto, de nombre "upstream". Luego, para aplicar los cambios que se encuentren en dicho repositorio en el repositorio local, se deben ejecutar los siguientes comandos:
 
 ```sh
-$ git fetch upstream
-$ git merge upstream/main
+git fetch upstream
+git merge upstream/main --allow-unrelated-histories
 ```
 
 ## Herramientas Requeridas para el desarrollo
@@ -278,8 +285,8 @@ Para desarrollar este proyecto, se requiere un entorno de programación que cuen
 
 * Ruby Version Manager (RVM), capaz de ejecutar lenguaje Ruby 3.3.4, disponible en https://rvm.io. En Mac es importante instalar OpenSSL versión 1 para que ruby compile con RVM. Los comandos son:
 ```sh
-$ brew install openssl@1.1
-$ rvm install 3.3.4 -C --with-openssl-dir=$(brew --prefix openssl@1.1)
+brew install openssl@1.1
+rvm install 3.3.4 -C --with-openssl-dir=$(brew --prefix openssl@1.1)
 ```
 La aplicación rails en el directorio `backend` cuenta con archivos `.ruby-version` y `.ruby-gemset` que permiten cambiar automáticamente a la versión y gemset correcta.
 * Node 18 o 20, instalable en [Mac con homebrew](https://formulae.brew.sh/formula/node@20), o en Linux ([Ubuntu](https://medium.com/@nsidana123/before-the-birth-of-of-node-js-15ee9262110c)), como sistema operativo host, en una máquina virtual, con Windows Subsystem for Linux (WSL), o con Docker.
