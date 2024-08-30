@@ -49,10 +49,9 @@ function App() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="fixed" sx={{ width: '100%', backgroundColor: '#f5c000' }}>
+    <>
+      <AppBar position="fixed" sx={{ backgroundColor: '#f5c000' }}>
         <Toolbar>
-          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             <IconButton
               size="large"
               edge="start"
@@ -65,11 +64,11 @@ function App() {
             <Typography variant="h5" component="div" sx={{ color: 'black' }}>
               BeerMark
             </Typography>
-          </Box>
         </Toolbar>
       </AppBar>
 
-      <Box>
+      {/* Main content area */}
+      <Box className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/bars" element={<Bars />} />
@@ -79,15 +78,16 @@ function App() {
         </Routes>
       </Box>
 
+
       <BottomNavigation
         value={value}
         onChange={handleNavigationChange}
         sx={{
-          width: '100%',
           position: 'fixed',
           bottom: 0,
+          width: '100%',
           backgroundColor: '#f5c000',
-          boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.2)'
+          boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.2)',
         }}
       >
         <BottomNavigationAction
@@ -101,7 +101,7 @@ function App() {
             },
             '&:hover:not(.Mui-selected)': {
               backgroundColor: '#e0b002',
-            }
+            },
           }}
         />
         <BottomNavigationAction
@@ -115,7 +115,7 @@ function App() {
             },
             '&:hover:not(.Mui-selected)': {
               backgroundColor: '#e0b002',
-            }
+            },
           }}
         />
         <BottomNavigationAction
@@ -129,8 +129,7 @@ function App() {
             },
             '&:hover:not(.Mui-selected)': {
               backgroundColor: '#e0b002',
-
-            }
+            },
           }}
         />
         <BottomNavigationAction
@@ -144,7 +143,7 @@ function App() {
             },
             '&:hover:not(.Mui-selected)': {
               backgroundColor: '#e0b002',
-            }
+            },
           }}
         />
         <BottomNavigationAction
@@ -158,11 +157,11 @@ function App() {
             },
             '&:hover:not(.Mui-selected)': {
               backgroundColor: '#e0b002',
-            }
+            },
           }}
         />
       </BottomNavigation>
-    </Box>
+    </>
   );
 }
 

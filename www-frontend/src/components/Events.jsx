@@ -33,7 +33,7 @@ function Events() {
 
   return (
     <Box 
-      sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', textAlign: 'center' }}
+    sx={{p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(60vh )'}}
     >
       <Typography variant="h3" sx={{ color: '#f5c000', mb: 2 }}>
         Events
@@ -47,6 +47,7 @@ function Events() {
         )}
         sx={{ mb: 2, width: '300px' }}
       />
+      
       {events.length > 0 ? (
         events.map(event => (
           <Box key={event.id} sx={{ mb: 2 }}>

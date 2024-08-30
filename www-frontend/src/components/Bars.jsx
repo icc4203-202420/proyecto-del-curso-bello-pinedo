@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Autocomplete, TextField, List, ListItem, ListItemText } from '@mui/material';
 import useAxios from 'axios-hooks';
 import useLocalStorageState from 'use-local-storage-state';
+import SearchBar from './PageElements/searchbar';
 
 function Bars() {
   const [searchKeywords, setSearchKeywords] = useState('');
@@ -9,32 +10,28 @@ function Bars() {
     defaultValue: []
   });
 
-  // Hook de Axios para realizar la búsqueda cuando se cambian las palabras clave
   const [{ data, loading, error }, refetch] = useAxios(
     {
       url: 'http://localhost:3001/api/v1/bars',
       method: 'GET'
     },
-    { manual: true } // Esto evita que se ejecute automáticamente al cargar el componente
+    { manual: true }
   );
 
   useEffect(() => {
     refetch();
   }, [refetch]);
 
-  // Efecto para guardar la nueva búsqueda en el localStorage
   useEffect(() => {
     if (data && !keywordList.includes(searchKeywords)) {
       setKeywordList([...keywordList, searchKeywords]);
     }
   }, [keywordList, data, searchKeywords, setKeywordList]);
 
-  // Función para manejar el cambio en el campo de texto
   const handleInputChange = (event, newInputValue) => {
     setSearchKeywords(newInputValue);
   };
 
-  // Función para manejar la búsqueda
   const handleSearch = () => {
     if (searchKeywords) {
       const filteredbars = data.bars.filter(bar =>
@@ -55,30 +52,17 @@ function Bars() {
   }, [data]);
 
   return (
-    <Box 
-      sx={{
-        p: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',  // Centers items horizontally
-        justifyContent: 'center',  // Centers items vertically
-        minHeight: '100vh',  // Ensures the Box takes full viewport height
-        textAlign: 'center',  // Centers text inside the Box
-      }}
-    >
-      <Typography variant="h3" sx={{ color: '#f5c000', mb: 2 }}>
-        bars
+    <Box sx={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: '70px' }}>
+      <Typography variant="h3" sx={{ color: '#f5c000', mb: 2, textAlign: 'center' }}>
+        Bars
       </Typography>
-      <Autocomplete
-        freeSolo
-        options={keywordList}
-        value={searchKeywords}
-        onInputChange={handleInputChange}
-        renderInput={(params) => (
-          <TextField {...params} label="Search bars" variant="outlined" fullWidth margin="normal" />
-        )}
+      <SearchBar
+        searchKeywords={searchKeywords}
+        setSearchKeywords={setSearchKeywords}
+        keywordList={keywordList}
+        label="Search Bars"
       />
-      <List>
+      <List sx={{ mt: 2 }}>
         {Array.isArray(searchResults) && searchResults.map((bar) => (
           <ListItem key={bar.id}>
             <ListItemText primary={bar.name} />
