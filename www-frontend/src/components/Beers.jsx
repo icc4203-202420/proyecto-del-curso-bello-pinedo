@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Autocomplete, TextField, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid } from '@mui/material';
 import useAxios from 'axios-hooks';
 import useLocalStorageState from 'use-local-storage-state';
 import SearchBar from './PageElements/searchbar';
@@ -18,15 +18,23 @@ function Beers() {
     { manual: true }
   );
 
+  const [searchResults, setSearchResults] = useState([]);
+
   useEffect(() => {
     refetch();
   }, [refetch]);
 
   useEffect(() => {
-    if (data && !keywordList.includes(searchKeywords)) {
+    if (data && !keywordList.includes(searchKeywords) && searchKeywords) {
       setKeywordList([...keywordList, searchKeywords]);
     }
   }, [keywordList, data, searchKeywords, setKeywordList]);
+
+  useEffect(() => {
+    if (data && data.beers) {
+      handleSearch();
+    }
+  }, [searchKeywords, data]);
 
   const handleInputChange = (event, newInputValue) => {
     setSearchKeywords(newInputValue);
@@ -43,32 +51,34 @@ function Beers() {
     }
   };
 
-  const [searchResults, setSearchResults] = useState([]);
-
-  useEffect(() => {
-    if (data && data.beers) {
-      setSearchResults(data.beers);
-    }
-  }, [data]);
-
   return (
-    <Box sx={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: '70px' }}>
+    <Box sx={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: '70px' }}>
       <Typography variant="h3" sx={{ color: '#f5c000', mb: 2, textAlign: 'center' }}>
         Beers
       </Typography>
       <SearchBar
         searchKeywords={searchKeywords}
         setSearchKeywords={setSearchKeywords}
-        keywordList={keywordList}
+        keywordList={[]}
         label="Search Beers"
       />
-      <List sx={{ mt: 2 }}>
+
+      <Grid container spacing={3} sx={{ mt: 2, color:'#f5c000' }}>
         {Array.isArray(searchResults) && searchResults.map((beer) => (
-          <ListItem key={beer.id}>
-            <ListItemText primary={beer.name} />
-          </ListItem>
+          <Grid item xs={12} sm={6} md={4} key={beer.id}>
+            <Card sx={{backgroundColor:'#f5c000'}}>
+              <CardContent>
+                <Typography variant="h6" component="div">
+                  {beer.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {beer.style}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </List>
+      </Grid>
 
       {loading && (
         <Typography variant="body1" margin="normal">

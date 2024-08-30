@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextField, Autocomplete } from '@mui/material';
 
-function SearchBar({ searchKeywords, setSearchKeywords, keywordList }) {
+function SearchBar({ searchKeywords, setSearchKeywords, keywordList, label }) { // Add label as a prop
   const handleInputChange = (event, newInputValue) => {
     setSearchKeywords(newInputValue);
   };
@@ -15,7 +15,7 @@ function SearchBar({ searchKeywords, setSearchKeywords, keywordList }) {
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Search Beers"
+          label={label} // Use the dynamic label prop here
           variant="outlined"
           fullWidth
           margin="normal"
