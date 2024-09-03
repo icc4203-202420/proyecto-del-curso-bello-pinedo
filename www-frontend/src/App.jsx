@@ -1,24 +1,16 @@
 import { useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import beerLogo from './assets/beer icon.png';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import HomeIcon from '@mui/icons-material/Home';
-import StoreIcon from '@mui/icons-material/Store';
-import EventIcon from '@mui/icons-material/Event';
-import PersonIcon from '@mui/icons-material/Person';
-import SportsBarIcon from '@mui/icons-material/SportsBar';
+import { AppBar, Box, Toolbar, Typography, IconButton, BottomNavigation, BottomNavigationAction, Button } from '@mui/material';
+import { Home as HomeIcon, Store as StoreIcon, Event as EventIcon, Person as PersonIcon, SportsBar as SportsBarIcon } from '@mui/icons-material';
 
 import Home from './components/Home';
 import Bars from './components/Bars';
 import Beers from './components/Beers';
 import Users from './components/Users';
 import Events from './components/Events';
+import SignupForm from './components/Signup';
+import LoginForm from './components/Login';
 
 function App() {
   const [value, setValue] = useState(0);
@@ -41,7 +33,7 @@ function App() {
         navigate('/events');
         break;
       case 4:
-        navigate('/users');
+        navigate('/login');
         break;
       default:
         navigate('/');
@@ -51,21 +43,23 @@ function App() {
   return (
     <>
       <AppBar position="fixed" sx={{ backgroundColor: '#f5c000' }}>
-        <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-            >
-              <img src={beerLogo} alt="logo" style={{ width: '30px', height: '30px' }} />
-            </IconButton>
-            <Typography variant="h5" component="div" sx={{ color: 'black' }}>
-              BeerMark
-            </Typography>
-        </Toolbar>
-      </AppBar>
+      <Toolbar>
+        <IconButton
+          size="large"
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2 }}
+        >
+          <img src={beerLogo} alt="logo" style={{ width: '30px', height: '30px' }} />
+        </IconButton>
+        <Typography variant="h5" component="div" sx={{ color: 'black', flexGrow: 1 }}>
+          BeerMark
+        </Typography>
+        <Button color="inherit" onClick={() => navigate('/signup')}>Sign Up</Button>
+        <Button color="inherit" onClick={() => navigate('/login')}>Login</Button>
+      </Toolbar>
+    </AppBar>
 
       {/* Main content area */}
       <Box className="main-content">
@@ -75,6 +69,8 @@ function App() {
           <Route path="/beers" element={<Beers />} />
           <Route path="/users" element={<Users />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/login" element={<LoginForm />} />
         </Routes>
       </Box>
 
