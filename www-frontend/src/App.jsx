@@ -91,7 +91,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/bars" element={<Bars />} />
           <Route path="/beers" element={<Beers />} />
-          <Route path="/beer/:id" element={<BeerDetails />} /> {/* Ruta para detalles de cerveza */}
+          <Route path="/beers/:id" element={<BeerDetails />} />
           <Route path="/users" element={<Users />} />
           <Route path="/events" element={<Events />} />
           <Route path="/signup" element={<SignupForm />} />
