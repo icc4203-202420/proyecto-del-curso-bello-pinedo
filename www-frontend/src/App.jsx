@@ -11,6 +11,7 @@ import Users from './components/Users';
 import Events from './components/Events';
 import SignupForm from './components/Signup';
 import LoginForm from './components/Login';
+import BeerDetails from './components/BeerDetails';  // Asegúrate de importar BeerDetails
 
 function App() {
   const [value, setValue] = useState(0);
@@ -47,10 +48,9 @@ function App() {
         navigate('/events');
         break;
       case 4:
-        if(currentUser) {
-        navigate('/user');
-        }
-        else {
+        if (currentUser) {
+          navigate('/users');
+        } else {
           navigate('/login');
         }
         break;
@@ -62,35 +62,36 @@ function App() {
   return (
     <>
       <AppBar position="fixed" sx={{ backgroundColor: '#f5c000' }}>
-      <Toolbar>
-        <IconButton
-          size="large"
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          sx={{ mr: 2 }}
-        >
-          <img src={beerLogo} alt="logo" style={{ width: '30px', height: '30px' }} />
-        </IconButton>
-        <Typography variant="h5" component="div" sx={{ color: 'black', flexGrow: 1 }}>
-          BeerMark
-        </Typography>
-        {currentUser ?(
-          <Button color="inherit" onClick={handleLogout}>Logout</Button>
-        ) : (
-          <>
-            <Button color="inherit" onClick={() => navigate('/signup')}>Sign Up</Button>
-            <Button color="inherit" onClick={() => navigate('/login')}>Login</Button>
-          </>
-        )}
-      </Toolbar>
-    </AppBar>
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+          >
+            <img src={beerLogo} alt="logo" style={{ width: '30px', height: '30px' }} />
+          </IconButton>
+          <Typography variant="h5" component="div" sx={{ color: 'black', flexGrow: 1 }}>
+            BeerMark
+          </Typography>
+          {currentUser ? (
+            <Button color="inherit" onClick={handleLogout}>Logout</Button>
+          ) : (
+            <>
+              <Button color="inherit" onClick={() => navigate('/signup')}>Sign Up</Button>
+              <Button color="inherit" onClick={() => navigate('/login')}>Login</Button>
+            </>
+          )}
+        </Toolbar>
+      </AppBar>
 
       <Box className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/bars" element={<Bars />} />
           <Route path="/beers" element={<Beers />} />
+          <Route path="/beer/:id" element={<BeerDetails />} /> {/* Ruta para detalles de cerveza */}
           <Route path="/users" element={<Users />} />
           <Route path="/events" element={<Events />} />
           <Route path="/signup" element={<SignupForm />} />
