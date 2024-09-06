@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import beerLogo from './assets/beer icon.png';
 import { AppBar, Box, Toolbar, Typography, IconButton, BottomNavigation, BottomNavigationAction, Button } from '@mui/material';
@@ -15,6 +15,20 @@ import LoginForm from './components/Login';
 function App() {
   const [value, setValue] = useState(0);
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    setCurrentUser(null);
+    navigate('/login');
+  };
 
   const handleNavigationChange = (event, newValue) => {
     setValue(newValue);
@@ -33,7 +47,12 @@ function App() {
         navigate('/events');
         break;
       case 4:
-        navigate('/login');
+        if(currentUser) {
+        navigate('/user');
+        }
+        else {
+          navigate('/login');
+        }
         break;
       default:
         navigate('/');
@@ -56,12 +75,17 @@ function App() {
         <Typography variant="h5" component="div" sx={{ color: 'black', flexGrow: 1 }}>
           BeerMark
         </Typography>
-        <Button color="inherit" onClick={() => navigate('/signup')}>Sign Up</Button>
-        <Button color="inherit" onClick={() => navigate('/login')}>Login</Button>
+        {currentUser ?(
+          <Button color="inherit" onClick={handleLogout}>Logout</Button>
+        ) : (
+          <>
+            <Button color="inherit" onClick={() => navigate('/signup')}>Sign Up</Button>
+            <Button color="inherit" onClick={() => navigate('/login')}>Login</Button>
+          </>
+        )}
       </Toolbar>
     </AppBar>
 
-      {/* Main content area */}
       <Box className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -70,7 +94,7 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/events" element={<Events />} />
           <Route path="/signup" element={<SignupForm />} />
-          <Route path="/login" element={<LoginForm />} />
+          <Route path="/login" element={<LoginForm setCurrentUser={setCurrentUser}/>} />
         </Routes>
       </Box>
 
