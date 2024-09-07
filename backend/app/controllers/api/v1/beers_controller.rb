@@ -3,7 +3,7 @@ class API::V1::BeersController < ApplicationController
   include Authenticable
 
   respond_to :json
-  before_action :set_beer, only: [:show, :update, :destroy]
+  before_action :set_beer, only: [:show, :update, :destroy, :bars] # Agregamos :bars aquí
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   # GET /beers
@@ -12,13 +12,6 @@ class API::V1::BeersController < ApplicationController
     render json: { beers: @beers }, status: :ok
   end
 
-  # def index
-  #   @beers = Rails.cache.fetch("beers", expires_in: 12.hours) do
-  #     Beer.includes(:brand, :brewery).all
-  #   end
-  #   render json: @beers
-  # end
-  
   # GET /beers/:id
   def show
     if @beer.image.attached?
@@ -60,12 +53,24 @@ class API::V1::BeersController < ApplicationController
     head :no_content
   end
 
+  # GET /beers/:id/bars
+  def bars
+    @bars = @beer.bars # Asegúrate de que @beer se haya establecido correctamente
+    if @bars.present?
+      render json: { bars: @bars }, status: :ok
+    else
+      render json: { error: "No bars found serving this beer" }, status: :not_found
+    end
+  end
+  
   private
 
   def set_beer
     @beer = Beer.find_by(id: params[:id])
-    render json: { error: 'Beer not found' }, status: :not_found if @beer.nil?
-  end  
+    unless @beer
+      render json: { error: 'Beer not found' }, status: :not_found
+    end
+  end 
 
   def beer_params
     params.require(:beer).permit(:name, :beer_type, 

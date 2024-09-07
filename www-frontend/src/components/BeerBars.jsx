@@ -1,38 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import useAxios from 'axios-hooks';
+import axiosInstance from './PageElements/axiosInstance';
+import { Box, Card, CardContent, Typography, Grid } from '@mui/material';
 
 const BeerBars = () => {
   const { id } = useParams(); // Obtener el ID de la cerveza desde la URL
-  const [{ data, loading, error }, refetch] = useAxios(
-    {
-      url: `http://localhost:3001/api/v1/beers/${id}/bars`, // Asumimos que tienes un endpoint para obtener los bares
-      method: 'GET'
-    },
-    { manual: true }
-  );
+  const [bars, setBars] = useState([]); // Estado para almacenar los bares
+  const [error, setError] = useState(''); // Manejo de errores
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
-
-  if (loading) return <Typography>Loading bars...</Typography>;
-  if (error) return <Typography>Error loading bars</Typography>;
-  if (!data || data.length === 0) return <Typography>No bars found for this beer.</Typography>;
+    axiosInstance.get(`/beers/${id}/bars`)
+      .then((res) => {
+        if (res.data.bars && res.data.bars.length > 0) {
+          setBars(res.data.bars); // Esto debería recibir la lista de bares
+        } else {
+          setError('No bars found serving this beer.');
+        }
+      })
+      .catch((error) => {
+        setError('Error fetching bars.');
+        console.error('Error fetching bars:', error);
+      });
+  }, [id]);
 
   return (
     <Box sx={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: '70px' }}>
-      <Typography variant="h4" component="div" sx={{ mb: 2, color: '#000' }}>
-        Bars Serving {data.beerName}
+      <Typography variant="h4" sx={{ mb: 3, color: '#f5c000' }}>
+        Bars Serving This Beer
       </Typography>
-      <List>
-        {data.bars.map((bar) => (
-          <ListItem key={bar.id}>
-            <ListItemText primary={bar.name} secondary={bar.address} />
-          </ListItem>
-        ))}
-      </List>
+
+      {error && (
+        <Typography variant="body1" color="error">
+          {error}
+        </Typography>
+      )}
+
+      {bars.length > 0 ? (
+        bars.map((bar) => (
+          <Card key={bar.id} sx={{ backgroundColor: '#f5c000', mb: 2 }}>
+            <CardContent>
+              <Typography variant="h6" component="div" sx={{ color: '#000' }}>
+                {bar.name}
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#000' }}>
+                {bar.address}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <Typography variant="body2" sx={{ color: '#000' }}>
+          No bars found serving this beer.
+        </Typography>
+      )}
     </Box>
   );
 };
