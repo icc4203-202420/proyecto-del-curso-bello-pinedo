@@ -3,7 +3,8 @@ class API::V1::UsersController < ApplicationController
   before_action :set_user, only: [:show, :update]  
   
   def index
-    @users = User.includes(:reviews, :address).all   
+    @users = User.all
+    render json: @users, status: :ok
   end
 
   def show
@@ -45,7 +46,7 @@ class API::V1::UsersController < ApplicationController
 end
 class API::V1::UsersController < ApplicationController
   respond_to :json
-  before_action :set_user, only: [:show, :update, :friendships, :add_friend] 
+  before_action :set_user, only: [:show, :update,] 
   
   def index
     @users = User.includes(:reviews, :address).all
@@ -53,7 +54,8 @@ class API::V1::UsersController < ApplicationController
   end
 
   def show
-  
+    @user = User.find(params[:id])
+    render json: @user
   end
 
   def create

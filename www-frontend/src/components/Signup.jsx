@@ -43,7 +43,7 @@ function SignupForm({ setCurrentUser }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '70px 0' }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box sx={{ width: '100%', maxWidth: '400px', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+        <Box sx={{ width: '100%', maxWidth: '400px', padding: '20px', backgroundColor: '#1E1E1E', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
           <Typography variant="h4" sx={{ color: '#f5c000', mb: 2, textAlign: 'center' }}>
             Sign Up
           </Typography>
@@ -93,7 +93,7 @@ function SignupForm({ setCurrentUser }) {
                     color: '#d4a000', // Label color when focused
                   },
                   '& .MuiOutlinedInput-input': {
-                    color: '#000000', // Text color
+                    color: '#f5c000', // Text color
                   },
                 }}
                 InputLabelProps={{
@@ -103,7 +103,9 @@ function SignupForm({ setCurrentUser }) {
                   style: { color: '#f5c000' }, // Initial text color
                 }}
               />
+              <Typography color='#f5c000'>
               <ErrorMessage name="first_name" component="div" />
+              </Typography>
               <Field
                 as={TextField}
                 name="last_name"
@@ -130,7 +132,7 @@ function SignupForm({ setCurrentUser }) {
                     color: '#d4a000', // Label color when focused
                   },
                   '& .MuiOutlinedInput-input': {
-                    color: '#000000', // Text color
+                    color: '#f5c000', // Text color
                   },
                 }}
                 InputLabelProps={{
@@ -140,7 +142,9 @@ function SignupForm({ setCurrentUser }) {
                   style: { color: '#f5c000' }, // Initial text color
                 }}
               />
+              <Typography color='#f5c000'>
               <ErrorMessage name="last_name" component="div" />
+              </Typography>
               <Field
                 as={TextField}
                 name="handle"
@@ -167,7 +171,7 @@ function SignupForm({ setCurrentUser }) {
                     color: '#d4a000', // Label color when focused
                   },
                   '& .MuiOutlinedInput-input': {
-                    color: '#000000', // Text color
+                    color: '#f5c000', // Text color
                   },
                 }}
                 InputLabelProps={{
@@ -177,7 +181,9 @@ function SignupForm({ setCurrentUser }) {
                   style: { color: '#f5c000' }, // Initial text color
                 }}
               />
+              <Typography color='#f5c000'>
               <ErrorMessage name="handle" component="div" />
+              </Typography>
               <Field
                 as={TextField}
                 name="email"
@@ -204,7 +210,7 @@ function SignupForm({ setCurrentUser }) {
                     color: '#d4a000', // Label color when focused
                   },
                   '& .MuiOutlinedInput-input': {
-                    color: '#000000', // Text color
+                    color: '#f5c000', // Text color
                   },
                 }}
                 InputLabelProps={{
@@ -214,7 +220,9 @@ function SignupForm({ setCurrentUser }) {
                   style: { color: '#f5c000' }, // Initial text color
                 }}
               />
+              <Typography color='#f5c000'>
               <ErrorMessage name="email" component="div" />
+              </Typography>
               <Field
                 as={TextField}
                 name="password"
@@ -241,7 +249,7 @@ function SignupForm({ setCurrentUser }) {
                     color: '#d4a000', // Label color when focused
                   },
                   '& .MuiOutlinedInput-input': {
-                    color: '#000000', // Text color
+                    color: '#f5c000', // Text color
                   },
                 }}
                 InputLabelProps={{
@@ -251,7 +259,9 @@ function SignupForm({ setCurrentUser }) {
                   style: { color: '#f5c000' }, // Initial text color
                 }}
               />
+              <Typography color='#f5c000'>
               <ErrorMessage name="password" component="div" />
+              </Typography>
               <Field
                 as={TextField}
                 name="password_confirmation"
@@ -278,7 +288,7 @@ function SignupForm({ setCurrentUser }) {
                     color: '#d4a000', // Label color when focused
                   },
                   '& .MuiOutlinedInput-input': {
-                    color: '#000000', // Text color
+                    color: '#f5c000', // Text color
                   },
                 }}
                 InputLabelProps={{
@@ -288,7 +298,9 @@ function SignupForm({ setCurrentUser }) {
                   style: { color: '#f5c000' }, // Initial text color
                 }}
               />
+              <Typography color='#f5c000'>
               <ErrorMessage name="password_confirmation" component="div" />
+              </Typography>
               <Button type="submit" sx={{ backgroundColor: '#f5c000', '&:hover': { backgroundColor: '#e0b002' }, mt: 2 }} variant="contained" fullWidth>
                 Sign Up
               </Button>

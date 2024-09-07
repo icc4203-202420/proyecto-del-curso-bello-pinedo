@@ -80,9 +80,6 @@ function Beers() {
                     <Typography variant="body2" color="text.secondary">
                       Style: {beer.style}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Brewery: {beer.brewery ? beer.brewery.name : 'Unknown'}
-                    </Typography>
                   </CardContent>
                 </CardActionArea>
               </Card>

@@ -3,15 +3,20 @@ import { useParams, Link } from 'react-router-dom';
 import axiosInstance from './PageElements/axiosInstance';
 import { Box, Card, CardContent, Typography, Grid, Button, Rating, TextField, Alert } from '@mui/material';
 
-const BeerDetails = () => {
+function BeerDetails() {
   const [beer, setBeer] = useState(null); // Estado para manejar la cerveza
   const [rating, setRating] = useState(0); // Estado para manejar el rating
   const [comment, setComment] = useState(''); // Estado para manejar el comentario
   const [error, setError] = useState(''); // Estado para manejar los mensajes de error
   const [success, setSuccess] = useState(''); // Estado para manejar el mensaje de éxito
   const [reviews, setReviews] = useState([]); // Estado para manejar las reseñas de otros usuarios
+  const [users, setUsers] = useState(null); // Estado para manejar los usuarios
   const { id } = useParams();
+  const storedUser = localStorage.getItem('currentUser');
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
+  const [loadUser, setLoadUser] = useState(false);
 
+  // Fetch beer details
   useEffect(() => {
     axiosInstance.get(`/beers/${id}`)
       .then((res) => {
@@ -23,6 +28,29 @@ const BeerDetails = () => {
       });
   }, [id]);
 
+  // Fetch reviews
+  useEffect(() => {
+    axiosInstance.get(`/reviews`)
+      .then((res) => {
+        setReviews(res.data.reviews);
+      })
+      .catch((error) => {
+        console.error('Error fetching reviews:', error);
+      });
+  }, [id]);
+
+  // Fetch users
+  useEffect(() => {
+    axiosInstance.get('/users')
+      .then(response => {
+        setUsers(response.data.users); // Ensure users is set as an array
+        setLoadUser(true);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the users!', error);
+      });
+  }, []);
+
   const handleRatingChange = (event, newRating) => {
     setRating(newRating);
   };
@@ -32,7 +60,7 @@ const BeerDetails = () => {
   };
 
   const handleSubmit = () => {
-    // Validar el comentario y el rating
+    // Validate the comment and rating
     const wordCount = comment.trim().split(/\s+/).length;
     
     if (wordCount < 15) {
@@ -47,11 +75,12 @@ const BeerDetails = () => {
 
     setError('');
     
-    axiosInstance.post(`/beers/${id}/reviews`, {
+    axiosInstance.post(`/users/${currentUser.id}/reviews`, {
+      beer_id: id,
       rating: rating,
-      comment: comment
+      text: comment
     })
-      .then((response) => {
+      .then(() => {
         setSuccess('Review submitted successfully!');
         setRating(0);
         setComment('');
@@ -66,7 +95,7 @@ const BeerDetails = () => {
     <>
       {beer ? (
         <Box key={beer.id} sx={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: '70px' }}>
-          {/* Descripcion de beer */}
+          {/* Beer description */}
           <Card sx={{ backgroundColor: '#f5c000' }}>
             <CardContent>
               <Typography variant="h4" component="div" sx={{ color: '#000' }}>
@@ -185,7 +214,7 @@ const BeerDetails = () => {
             </Card>
           </Box>
 
-          {/* Lista de reviews */}
+          {/* Reviews list */}
           <Box sx={{ mt: 5 }}>
             <Card sx={{ backgroundColor: '#f5c000', mb: 2 }}>
               <CardContent>
@@ -194,19 +223,21 @@ const BeerDetails = () => {
                 </Typography>
 
                 {reviews.length > 0 ? (
-                  reviews.map((review) => (
-                    <Box key={review.id} sx={{ backgroundColor: '#fff', mb: 2, p: 2, borderRadius: '8px', border: '1px solid #f5c000' }}>
-                      <Typography variant="body1" sx={{ color: '#000' }}>
-                        <strong>Rating:</strong> {review.rating}
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: '#000' }}>
-                        <strong>Comment:</strong> {review.comment}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#000' }}>
-                        <strong>Posted by:</strong> {review.user.name}
-                      </Typography>
-                    </Box>
-                  ))
+                  reviews
+                    .filter(review => review.beer_id === parseInt(id)) // Filter reviews by beer ID
+                    .map((review) => (
+                      <Box key={review.id} sx={{ backgroundColor: '#fff', mb: 2, p: 2, borderRadius: '8px', border: '1px solid #f5c000' }}>
+                        <Typography variant="body1" sx={{ color: '#000' }}>
+                          <strong>Rating:</strong> {review.rating}
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: '#000' }}>
+                          <strong>Comment:</strong> {review.text}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#000' }}>
+                          <strong>Posted by:</strong> {review.user_id || 'Unknown'}
+                        </Typography>
+                      </Box>
+                    ))
                 ) : (
                   <Typography variant="body2" sx={{ color: '#000' }}>
                     No reviews yet.
@@ -222,6 +253,6 @@ const BeerDetails = () => {
       )}
     </>
   );
-};
+}
 
 export default BeerDetails;

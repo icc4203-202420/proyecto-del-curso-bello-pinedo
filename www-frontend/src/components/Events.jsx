@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Grid, TextField, Autocomplete } from '@mui/material';
 import axios from 'axios';
-import SearchBar from './PageElements/searchbar';
 
 function Events() {
   const [bars, setBars] = useState([]);
@@ -56,11 +55,12 @@ function Events() {
 
       {bars.length > 0 && (
         <Autocomplete
-          options={bars}
-          getOptionLabel={(option) => option.name}
+          options={bars.length ? bars : []} // Fallback to an empty array if no bars are fetched
+          getOptionLabel={(option) => option.name || ''} // Safeguard for missing names
           onChange={(event, newValue) => setSelectedBar(newValue)}
           renderInput={(params) => (
             <TextField
+              {...params}
               label="Select a Bar"
               variant="outlined"
               fullWidth
@@ -68,7 +68,7 @@ function Events() {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: '#f5c000', 
+                    borderColor: '#f5c000',
                   },
                   '&:hover fieldset': {
                     borderColor: '#e0b002',
@@ -76,14 +76,14 @@ function Events() {
                   '&.Mui-focused fieldset': {
                     borderColor: '#f5c000',
                   },
-                  backgroundColor: '#1a1a1a', 
+                  backgroundColor: '#1a1a1a',
                   color: '#f5c000',
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#f5c000', 
+                  color: '#f5c000',
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#e0b002', 
+                  color: '#e0b002',
                 },
               }}
             />

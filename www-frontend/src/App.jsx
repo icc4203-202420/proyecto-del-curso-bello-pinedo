@@ -13,17 +13,29 @@ import SignupForm from './components/Signup';
 import LoginForm from './components/Login';
 import BeerDetails from './components/BeerDetails';
 import BeerBars from './components/BeerBars';
+import axiosInstance from './components/PageElements/axiosInstance';
 
 function App() {
   const [value, setValue] = useState(0);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
+  const [users, setUser] = useState(null);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (user) {
       setCurrentUser(user);
     }
+  }, []);
+
+  useEffect(() => {
+    axiosInstance.get('/users')
+      .then(response => {
+        setUser(response.data.user);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the user!', error);
+      });
   }, []);
 
   const handleLogout = () => {
@@ -77,11 +89,11 @@ function App() {
             BeerMark
           </Typography>
           {currentUser ? (
-            <Button color="inherit" onClick={handleLogout}>Logout</Button>
+            <Button color="inherit" onClick={handleLogout}><Typography color='black'>Log out</Typography></Button>
           ) : (
             <>
-              <Button color="inherit" onClick={() => navigate('/signup')}>Sign Up</Button>
-              <Button color="inherit" onClick={() => navigate('/login')}>Login</Button>
+              <Button color="inherit" onClick={() => navigate('/signup')}><Typography color='black'>Sign Up</Typography></Button>
+              <Button color="inherit" onClick={() => navigate('/login')}><Typography color='black'>Log in</Typography></Button>
             </>
           )}
         </Toolbar>
@@ -93,7 +105,7 @@ function App() {
           <Route path="/bars" element={<Bars />} />
           <Route path="/beers" element={<Beers />} />
           <Route path="/beers/:id" element={<BeerDetails />} />
-          <Route path="/beer/:id/bars" element={<BeerBars />} />
+          <Route path="/beer/:id/bars" element={<BeerBars users={users} />} />
           <Route path="/users" element={<Users />} />
           <Route path="/events" element={<Events />} />
           <Route path="/signup" element={<SignupForm />} />
