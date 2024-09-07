@@ -11,7 +11,8 @@ import Users from './components/Users';
 import Events from './components/Events';
 import SignupForm from './components/Signup';
 import LoginForm from './components/Login';
-import BeerDetails from './components/BeerDetails';  // Asegúrate de importar BeerDetails
+import BeerDetails from './components/BeerDetails';
+import BeerBars from './components/BeerBars';
 
 function App() {
   const [value, setValue] = useState(0);
@@ -92,6 +93,7 @@ function App() {
           <Route path="/bars" element={<Bars />} />
           <Route path="/beers" element={<Beers />} />
           <Route path="/beers/:id" element={<BeerDetails />} />
+          <Route path="/beer/:id/bars" element={<BeerBars />} />
           <Route path="/users" element={<Users />} />
           <Route path="/events" element={<Events />} />
           <Route path="/signup" element={<SignupForm />} />
