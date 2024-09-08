@@ -63,6 +63,10 @@ function BeerDetails() {
 
   const handleSubmit = () => {
     // Validate the comment and rating
+    if (!currentUser) {
+      setError('You must be logged in to submit a review.');
+      return;
+    }
     const wordCount = comment.trim().split(/\s+/).length;
     
     if (wordCount < 15) {
