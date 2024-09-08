@@ -20,11 +20,13 @@ function BeerDetails() {
   useEffect(() => {
     axiosInstance.get(`/beers/${id}`)
       .then((res) => {
-        setBeer(res.data.beer);
-        setRating(res.data.beer.avg_rating || 0); // Establecer rating inicial si existe
+        setBeer(res.data);  // La respuesta ya debe incluir la información de la cervecería
+        setRating(res.data.avg_rating || 0); // Establecer rating inicial si existe
+        setReviews(res.data.reviews || []);  // Cargar las reviews
       })
       .catch((error) => {
         console.error('Error fetching beer:', error);
+        setError('Error fetching beer details.');
       });
   }, [id]);
 
@@ -104,9 +106,15 @@ function BeerDetails() {
               <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item xs={12}>
                   <Typography variant="body1" sx={{ color: '#000' }}>
+                    <strong>Brewery:</strong> {beer.breweries && beer.breweries.length > 0 ? beer.breweries[0].name : 'Unknown'}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="body1" sx={{ color: '#000' }}>
                     <strong>Style:</strong> {beer.style || 'Unknown'}
                   </Typography>
                 </Grid>
+                {/* Otras propiedades de la cerveza */}
                 <Grid item xs={6}>
                   <Typography variant="body1" sx={{ color: '#000' }}>
                     <strong>Hop:</strong> {beer.hop || 'Unknown'}
@@ -124,17 +132,12 @@ function BeerDetails() {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography variant="body1" sx={{ color: '#000' }}>
-                    <strong>ABV:</strong> {beer.abv || 'Unknown'}
+                    <strong>ABV:</strong> {beer.alcohol || 'Unknown'}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography variant="body1" sx={{ color: '#000' }}>
                     <strong>IBU:</strong> {beer.ibu || 'Unknown'}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body1" sx={{ color: '#000' }}>
-                    <strong>Alcohol:</strong> {beer.alcohol || 'Unknown'}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>

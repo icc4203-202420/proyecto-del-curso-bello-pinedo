@@ -15,12 +15,12 @@ class API::V1::BeersController < ApplicationController
   # GET /beers/:id
   def show
     if @beer.image.attached?
-      render json: @beer.as_json.merge({ 
+      render json: @beer.as_json(include: { breweries: { only: [:name] } }).merge({ 
         image_url: url_for(@beer.image), 
         thumbnail_url: url_for(@beer.thumbnail)}),
         status: :ok
     else
-      render json: { beer: @beer.as_json }, status: :ok
+      render json: @beer.as_json(include: { breweries: { only: [:name] } }), status: :ok
     end 
   end
 
