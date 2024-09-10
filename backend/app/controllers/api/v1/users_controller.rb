@@ -1,10 +1,9 @@
 class API::V1::UsersController < ApplicationController
   respond_to :json
-  before_action :set_user, only: [:show, :update] 
+  before_action :set_user, only: [:show, :update]  
   
   def index
-    @users = User.includes(:reviews, :address).all
-    render json: @users, status: :ok
+    @users = User.includes(:reviews, :address).all   
   end
 
   def show
