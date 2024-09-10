@@ -6,6 +6,8 @@ import { Home as HomeIcon, Store as StoreIcon, Event as EventIcon, Person as Per
 
 import Home from './components/Home';
 import Bars from './components/Bars';
+import BarDetails from './components/BarDetails';
+import MapSearch from './components/MapSearch';
 import Beers from './components/Beers';
 import Users from './components/Users';
 import Events from './components/Events';
@@ -103,6 +105,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/bars" element={<Bars />} />
+          <Route path="/bars/:id" element={<BarDetails />} /> 
+          <Route path="/map" element={<MapSearch />} />
           <Route path="/beers" element={<Beers />} />
           <Route path="/beers/:id" element={<BeerDetails />} />
           <Route path="/beer/:id/bars" element={<BeerBars users={users} />} />

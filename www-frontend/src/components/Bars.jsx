@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Grid } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import useAxios from 'axios-hooks';
 import useLocalStorageState from 'use-local-storage-state';
 import SearchBar from './PageElements/searchbar';
@@ -17,6 +18,8 @@ function Bars() {
     },
     { manual: true }
   );
+
+  const navigate = useNavigate(); // Añadimos la funcionalidad de navegación
 
   const [searchResults, setSearchResults] = useState([]);
 
@@ -51,6 +54,15 @@ function Bars() {
     }
   };
 
+  // Añadimos un botón que navega al mapa
+  const goToMap = () => {
+    navigate('/map');
+  };
+
+  const goToBarDetails = (barId) => {
+    navigate(`/bars/${barId}`);
+  };
+
   return (
     <Box sx={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: '70px' }}>
       <Typography variant="h3" sx={{ color: '#f5c000', mb: 2, textAlign: 'center' }}>
@@ -63,10 +75,18 @@ function Bars() {
         label="Search Bars"
       />
 
+      <Button 
+        variant="contained" 
+        sx={{ mt: 3, backgroundColor: '#000', color: '#f5c000' }}
+        onClick={goToMap}
+      >
+        Search Bars by Map
+      </Button>
+
       <Grid container spacing={3} sx={{ mt: 2, color:'#f5c000' }}>
         {Array.isArray(searchResults) && searchResults.map((bar) => (
           <Grid item xs={12} sm={6} md={4} key={bar.id}>
-            <Card sx={{ backgroundColor: '#f5c000' }}>
+            <Card sx={{ backgroundColor: '#f5c000' }} onClick={() => goToBarDetails(bar.id)}>
               <CardContent>
                 <Typography variant="h6" component="div">
                   {bar.name}
