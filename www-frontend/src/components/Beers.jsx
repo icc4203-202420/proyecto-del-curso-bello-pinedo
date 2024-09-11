@@ -69,9 +69,8 @@ function Beers() {
       <Grid container spacing={3} sx={{ mt: 2, color:'#f5c000' }}>
         {Array.isArray(searchResults) && searchResults.map((beer) => (
           <Grid item xs={12} sm={6} md={4} key={beer.id}>
-            {/* Aquí añadimos un Link para redirigir a los detalles */}
             <Link to={`/beers/${beer.id}`} style={{ textDecoration: 'none' }}>
-              <Card sx={{backgroundColor:'#f5c000'}}>
+              <Card sx={{backgroundColor:'#f5c000' , transition: 'background-color 0.3s ease', '&:hover':{backgroundColor: '#e0b002'}}}>
                 <CardActionArea>
                   <CardContent>
                     <Typography variant="h6" component="div">

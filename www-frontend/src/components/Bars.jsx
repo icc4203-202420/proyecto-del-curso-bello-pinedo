@@ -86,7 +86,7 @@ function Bars() {
       <Grid container spacing={3} sx={{ mt: 2, color:'#f5c000' }}>
         {Array.isArray(searchResults) && searchResults.map((bar) => (
           <Grid item xs={12} sm={6} md={4} key={bar.id}>
-            <Card sx={{ backgroundColor: '#f5c000' }} onClick={() => goToBarDetails(bar.id)}>
+            <Card sx={{ backgroundColor: '#f5c000' , transition: 'background-color 0.3s ease', '&:hover':{backgroundColor: '#e0b002'}}} onClick={() => goToBarDetails(bar.id)}>
               <CardContent>
                 <Typography variant="h6" component="div">
                   {bar.name}

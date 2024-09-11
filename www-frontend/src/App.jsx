@@ -16,6 +16,7 @@ import LoginForm from './components/Login';
 import BeerDetails from './components/BeerDetails';
 import BeerBars from './components/BeerBars';
 import axiosInstance from './components/PageElements/axiosInstance';
+import EventDetails from './components/EventDetails';
 
 function App() {
   const [value, setValue] = useState(0);
@@ -112,8 +113,10 @@ function App() {
           <Route path="/beer/:id/bars" element={<BeerBars users={users} />} />
           <Route path="/users" element={<Users />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/login" element={<LoginForm setCurrentUser={setCurrentUser}/>} />
+
         </Routes>
       </Box>
 
@@ -134,6 +137,7 @@ function App() {
           icon={<HomeIcon />}
           sx={{
             color: '#000',
+            transition: 'background-color 0.3s ease',
             '&.Mui-selected': {
               color: '#f5c000',
               backgroundColor: '#000',
@@ -150,6 +154,7 @@ function App() {
             color: '#000',
             '&.Mui-selected': {
               color: '#f5c000',
+              transition: 'background-color 0.3s ease',
               backgroundColor: '#000',
             },
             '&:hover:not(.Mui-selected)': {
@@ -162,6 +167,7 @@ function App() {
           icon={<StoreIcon />}
           sx={{
             color: '#000',
+            transition: 'background-color 0.3s ease',
             '&.Mui-selected': {
               color: '#f5c000',
               backgroundColor: '#000',
@@ -176,6 +182,7 @@ function App() {
           icon={<EventIcon />}
           sx={{
             color: '#000',
+            transition: 'background-color 0.3s ease',
             '&.Mui-selected': {
               color: '#f5c000',
               backgroundColor: '#000',
@@ -190,6 +197,7 @@ function App() {
           icon={<PersonIcon />}
           sx={{
             color: '#000',
+            transition: 'background-color 0.3s ease',
             '&.Mui-selected': {
               color: '#f5c000',
               backgroundColor: '#000',

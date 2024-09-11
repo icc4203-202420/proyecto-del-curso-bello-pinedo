@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Grid, TextField, Autocomplete } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, TextField, Autocomplete, CardActionArea } from '@mui/material';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function Events() {
@@ -92,22 +93,30 @@ function Events() {
       )}
 
       {events.length > 0 ? (
+        
         <Grid container spacing={3} sx={{ mt: 2, color: '#f5c000' }}>
           {Array.isArray(events) && events.map((event) => (
             <Grid item xs={12} sm={6} md={4} key={event.id}>
-              <Card sx={{ backgroundColor: '#f5c000' }}>
-                <CardContent>
-                  <Typography variant="h6" component="div">
-                    {event.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {new Date(event.date).toLocaleString()}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {event.description}
-                  </Typography>
-                </CardContent>
+              <Link to={`/events/${event.id}`} key={event.id} style={{ textDecoration: 'none' }}>
+              <Card sx={{ backgroundColor: '#f5c000', transition: 'background-color 0.3s ease', '&:hover':{backgroundColor: '#e0b002'} }}>
+                <CardActionArea>
+                  <CardContent>
+                    <Typography variant="h6" component="div">
+                      {event.name}
+                    </Typography>
+                    <Typography variant="h6" component="div">
+                      {event.id}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {new Date(event.date).toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {event.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
               </Card>
+              </Link>
             </Grid>
           ))}
         </Grid>

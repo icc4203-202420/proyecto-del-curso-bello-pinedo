@@ -29,11 +29,15 @@ Rails.application.routes.draw do
         end
       end
       resources :users do
-        resources :reviews, only: [:index]
-        resources :friendships
+        resources :reviews, only: [:index, :create, :update, :destroy]
+      end
+      resources :events do
+        resources :attendances, only: [:index, :show], action: 'indexAttendances'
       end
       
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
+      resources :events
+      resources :attendances, only: [:index, :show, :create, :update, :destroy]
     end
   end
 end
