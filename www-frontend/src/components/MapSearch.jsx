@@ -45,7 +45,7 @@ const MapSearch = () => {
         {
           params: {
             address: searchKeywords,
-            key: 'AIzaSyDWvnNjGnO6p5DzKOpJNdX6SQXddqLrGUY', // Reemplaza con tu clave de API
+            key: 'api_key', // Reemplaza con tu clave de API
           },
         }
       );
@@ -91,7 +91,7 @@ const MapSearch = () => {
       )}
 
       <LoadScript
-        googleMapsApiKey="AIzaSyDWvnNjGnO6p5DzKOpJNdX6SQXddqLrGUY"
+        googleMapsApiKey="api_key"
         onLoad={() => console.log('Google Maps API loaded successfully')}
         onError={(error) => console.error('Error loading Google Maps API:', error)}
       >
