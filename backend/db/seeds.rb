@@ -51,4 +51,20 @@ if Rails.env.development?
     end
   end
 
+  # Añadir un bar específico
+  bar = Bar.create!(
+    name: "Barbazul",
+    latitude: -33.408192588263745,
+    longitude: -70.55047963883649,
+    address: FactoryBot.create(:address, country: countries.sample)
+  )
+  puts "Bar creado: #{bar.name} (#{bar.latitude}, #{bar.longitude})"
+
+  bar = Bar.create!(
+    name: "Cantina Montt",
+    latitude: -33.43857515025048,
+    longitude: -70.6157713412602,
+    address: FactoryBot.create(:address, country: countries.sample)
+  )
+  puts "Bar creado: #{bar.name} (#{bar.latitude}, #{bar.longitude})"
 end

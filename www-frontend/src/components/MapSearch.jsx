@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import useAxios from 'axios-hooks';
+import useLocalStorageState from 'use-local-storage-state';
 import SearchBar from './PageElements/searchbar';
 
 const containerStyle = {
@@ -11,56 +12,68 @@ const containerStyle = {
 };
 
 const defaultCenter = {
-  lat: -33.4489,
+  lat: -33.4489, // Latitud por defecto (Santiago, Chile)
   lng: -70.6693,
 };
 
 const MapSearch = () => {
-  const [bars, setBars] = useState([]); // Estado para los bares
-  const [searchKeywords, setSearchKeywords] = useState(''); // Estado para la búsqueda
+  const [searchKeywords, setSearchKeywords] = useState('');
+  const [keywordList, setKeywordList] = useLocalStorageState('barApp/Search/KeywordList', {
+    defaultValue: [],
+  });
+
+  const [{ data, loading, error }, refetch] = useAxios(
+    {
+      url: 'http://localhost:3001/api/v1/bars',
+      method: 'GET',
+    },
+    { manual: true }
+  );
+
+  const navigate = useNavigate(); // Para navegación entre vistas
+  const [searchResults, setSearchResults] = useState([]); // Para manejar los resultados filtrados
   const [center, setCenter] = useState(defaultCenter); // Centro del mapa
-  const [filteredBars, setFilteredBars] = useState([]); // Bares filtrados
-  const [error, setError] = useState(''); // Estado para manejar errores
 
-  const navigate = useNavigate(); // Navegación
+  // Fetch de los datos iniciales (bares)
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
-  const fetchBarsNearLocation = async (lat, lng) => {
-    try {
-      const response = await axios.get('http://localhost:3001/api/v1/bars', {
-        params: { lat, lng },
-      });
-      setFilteredBars(response.data.bars || []);
-    } catch (error) {
-      console.error('Error fetching bars:', error);
-      setError('Error fetching bars data.');
+  // Guarda la búsqueda en localStorage si no está ya en la lista
+  useEffect(() => {
+    if (data && !keywordList.includes(searchKeywords) && searchKeywords) {
+      setKeywordList([...keywordList, searchKeywords]);
+    }
+  }, [keywordList, data, searchKeywords, setKeywordList]);
+
+  // Maneja la búsqueda de bares en tiempo real
+  useEffect(() => {
+    if (data && data.bars) {
+      handleSearch();
+    }
+  }, [searchKeywords, data]);
+
+  // Filtra los bares por nombre y actualiza los resultados
+  const handleSearch = () => {
+    if (searchKeywords) {
+      const filteredBars = data.bars.filter((bar) =>
+        bar.name.toLowerCase().includes(searchKeywords.toLowerCase())
+      );
+      setSearchResults(filteredBars);
+      if (filteredBars.length > 0) {
+        setCenter({
+          lat: filteredBars[0].latitude,
+          lng: filteredBars[0].longitude,
+        });
+      }
+    } else {
+      setSearchResults(data.bars);
     }
   };
 
-  // Función para geocodificar la dirección ingresada
-  const handleSearch = async () => {
-    try {
-      setError('');
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json`,
-        {
-          params: {
-            address: searchKeywords,
-            key: 'AIzaSyDWvnNjGnO6p5DzKOpJNdX6SQXddqLrGUY', // Reemplaza con tu clave de API
-          },
-        }
-      );
-
-      if (response.data.results.length > 0) {
-        const location = response.data.results[0].geometry.location;
-        setCenter(location); // Actualizar la ubicación del centro en el mapa
-        fetchBarsNearLocation(location.lat, location.lng); // Buscar bares cercanos a las coordenadas
-      } else {
-        setError('No results found for the entered location.');
-      }
-    } catch (error) {
-      console.error('Error fetching geocoding data:', error);
-      setError('Error fetching geocoding data.');
-    }
+  // Función para centrar el mapa en la ubicación inicial
+  const handleCenterReset = () => {
+    setCenter(defaultCenter);
   };
 
   return (
@@ -69,34 +82,37 @@ const MapSearch = () => {
         Search Bars by Location
       </Typography>
 
-      {/* Usa SearchBar para buscar por ubicación */}
       <SearchBar
         searchKeywords={searchKeywords}
         setSearchKeywords={setSearchKeywords}
-        label="Search Location (Country, City, Street)"
+        keywordList={[]}
+        label="Search Bars"
       />
 
       <Button
         variant="contained"
         sx={{ mt: 3, backgroundColor: '#000', color: '#f5c000' }}
-        onClick={handleSearch}
+        onClick={handleCenterReset}
       >
-        Search
+        Center Map
       </Button>
 
-      {error && (
-        <Typography variant="body1" color="error" margin="normal">
-          {error}
+      {loading && (
+        <Typography variant="body1" margin="normal">
+          Loading map...
         </Typography>
       )}
 
-      <LoadScript
-        googleMapsApiKey="AIzaSyDWvnNjGnO6p5DzKOpJNdX6SQXddqLrGUY"
-        onLoad={() => console.log('Google Maps API loaded successfully')}
-        onError={(error) => console.error('Error loading Google Maps API:', error)}
-      >
+      {error && (
+        <Typography variant="body1" color="error" margin="normal">
+          Error loading map data.
+        </Typography>
+      )}
+
+      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_KEY}>
         <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
-          {filteredBars.map((bar) => (
+          {/* Renderiza los marcadores de los bares filtrados */}
+          {searchResults.map((bar) => (
             <Marker
               key={bar.id}
               position={{ lat: bar.latitude, lng: bar.longitude }}
