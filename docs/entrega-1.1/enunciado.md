@@ -44,7 +44,7 @@ Cada requisito será evaluado en escala 1-5. Estos puntos se traducen a ponderad
 * 2 -> 0.25: Esbozo de solucion
 * 3 -> 0.5: Logro intermedio
 * 4 -> 0.75: Alto logro con deficiencias o errores menores
-* 5 -> 0.75: Implementación completa y correcta
+* 5 -> 1.00: Implementación completa y correcta
 
 Los ponderadores aplican al puntaje máximo del ítem. La nota en escala 1-7 se calcula como la suma de puntajes parciales ponderados más el punto base.
 
