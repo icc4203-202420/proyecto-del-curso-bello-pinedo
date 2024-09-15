@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axiosInstance from './PageElements/axiosInstance';
 import { Box, Card, CardContent, Typography, Grid, Button, CircularProgress } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 function EventDetails() {
   const [event, setEvent] = useState(null);
@@ -97,6 +99,11 @@ function EventDetails() {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="h4" component="div" sx={{ color: '#000' }}>
                     {event.name}
+                    {(attendance && attendance.checked_in === true) ? (
+                      <CheckCircleIcon sx={{ color: '#000', marginLeft: 1 }} />
+                    ) : (
+                      <CancelIcon sx={{ color: '#000', marginLeft: 1 }} />
+                    )}
                   </Typography>
                   {!attendance || (attendance && attendance.checked_in === false) ? (
                     <Button variant="contained" sx={{ backgroundColor: '#000', color: '#f5c000' }} onClick={handleAttend}>
@@ -108,9 +115,6 @@ function EventDetails() {
                     </Button>
                   )}
                 </Box>
-                <Typography variant="h6" component="div" sx={{ color: '#000' }}>
-                  {(attendance && attendance.checked_in === true) ? 'You are attending this event' : 'You are not attending this event'}
-                </Typography>
                 <Grid container spacing={2} sx={{ mt: 2 }}>
                   <Grid item xs={12}>
                     <Typography variant="body1" sx={{ color: '#000' }}>
