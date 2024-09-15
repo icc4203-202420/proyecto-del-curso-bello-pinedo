@@ -29,6 +29,10 @@ function EventDetails() {
     );
 
     // Fetch attendance details
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
     axiosInstance.get(`/events/${id}/attendances`, { params: { "user_id": currentUser.id } })
       .then((res) => {
         setAttendance(res.data[0]);
@@ -42,6 +46,10 @@ function EventDetails() {
   }, [id, refresh]);
 
   const handleAttend = () => {
+    if (!currentUser) {
+      alert('You must be logged in to attend an event.');
+      return;
+    }
     if (attendance) {
       axiosInstance.put(`/attendances/${attendance.id}`, { "user_id": currentUser.id, "event_id":id , "checked_in": true })
         .then((res) => {
