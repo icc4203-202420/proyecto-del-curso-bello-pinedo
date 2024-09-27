@@ -17,6 +17,7 @@ import BeerDetails from './components/BeerDetails';
 import BeerBars from './components/BeerBars';
 import axiosInstance from './components/PageElements/axiosInstance';
 import EventDetails from './components/EventDetails';
+import UserDetails from './components/UserDetails';
 
 function App() {
   const [value, setValue] = useState(0);
@@ -112,6 +113,7 @@ function App() {
           <Route path="/beers/:id" element={<BeerDetails />} />
           <Route path="/beer/:id/bars" element={<BeerBars users={users} />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/users/:id" element={< UserDetails/>} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/signup" element={<SignupForm />} />
