@@ -47,18 +47,16 @@ class API::V1::EventsController < ApplicationController
   end
 
   def show_images
-    if @event.event_pictures.attached?
-      pictures = @event.event_pictures.map do |picture|
-        {
-          id: picture.id,
-          url: url_for(picture.image),
-          thumbnail_url: url_for(picture.image.variant(resize: "100x100"))
-        }
-      end
-      render json: { images: pictures }, status: :ok
-    else
-      render json: { images: [] }, status: :ok
+    event = Event.find(params[:id])
+    images = event.event_pictures.map do |event_picture|
+      {
+        id: event_picture.id,
+        url: url_for(event_picture.image),
+        thumbnail_url: event_picture.image.variant(resize: "100x100").processed.url
+      }
     end
+
+    render json: { images: images }, status: :ok
   end
 
   private
