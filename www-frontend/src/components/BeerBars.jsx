@@ -12,7 +12,7 @@ const BeerBars = () => {
     axiosInstance.get(`/beers/${id}/bars`)
       .then((res) => {
         if (res.data.bars && res.data.bars.length > 0) {
-          setBars(res.data.bars); // Esto debería recibir la lista de bares
+          setBars(res.data.bars);
         } else {
           setError('No bars found serving this beer.');
         }

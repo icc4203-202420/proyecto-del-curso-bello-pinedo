@@ -17,6 +17,8 @@ import BeerDetails from './components/BeerDetails';
 import BeerBars from './components/BeerBars';
 import axiosInstance from './components/PageElements/axiosInstance';
 import EventDetails from './components/EventDetails';
+import EventGallery from './components/EventGallery';
+import EventPictureUpload from './components/EventPictureUpload';
 import UserDetails from './components/UserDetails';
 
 function App() {
@@ -116,6 +118,8 @@ function App() {
           <Route path="/users/:id" element={< UserDetails/>} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/events/:id/gallery" element={<EventGallery />} />
+          <Route path="/events/:id/upload" element={<EventPictureUpload />} />
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/login" element={<LoginForm setCurrentUser={setCurrentUser}/>} />
 

@@ -142,6 +142,15 @@ function EventDetails() {
                 </Grid>
               </CardContent>
             </Card>
+
+            <Box sx={{ mt: 3, textAlign: 'center' }}>
+              <Link to={`/events/${id}/gallery`} style={{ textDecoration: 'none' }}>
+                <Button variant="contained" sx={{ backgroundColor: '#f5c000', color: '#000' }}>
+                  View Event Gallery
+                </Button>
+              </Link>
+            </Box>
+
             <Box sx={{ mt: 3, textAlign: 'center' }}>
               <Link to="/events" style={{ textDecoration: 'none' }}>
                 <Button variant="contained" sx={{ backgroundColor: '#f5c000', color: '#000' }}>

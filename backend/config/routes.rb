@@ -21,7 +21,9 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :bars do
-        resources :events
+        resources :events do
+          resources :images, only: [:create], controller: 'event_pictures'
+        end
       end
       resources :beers do
         member do
