@@ -89,45 +89,60 @@ function UserDetails() {
             <Card sx={{ backgroundColor: '#f5c000', '&:hover': '#e0b002' }}>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="h4" component="div" sx={{ color: '#000' }}>
-                    {user.first_name} {user.last_name}
-                    {isFollowing ? (
+                <Typography variant="h4" component="div" sx={{ color: '#000' }}>
+                  {user.first_name} {user.last_name}
+                  {currentUser.id != parseInt(id) ? (
+                    isFollowing ? (
                       <CheckCircleIcon sx={{ color: '#000', marginLeft: 1 }} />
                     ) : (
                       <CancelIcon sx={{ color: '#000', marginLeft: 1 }} />
-                    )}
-                  </Typography>
-                  {!isFollowing ? (
-                   <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                   <Button variant="contained" sx={{ backgroundColor: '#000', color: '#f5c000', mb: 2,  }} onClick={handleFollow}>
-                     Follow
-                   </Button>
-                    <Typography variant="body1" sx={{ color: '#000' }}><strong>Select Event:</strong></Typography>
-                   {/* Event Selector */}
-                   
-                   <FormControl fullWidth>
-                     <InputLabel id="event-selector-label">Event</InputLabel>
-                     <Select
-                       labelId="event-selector-label"
-                       value={selectedEvent}
-                       onChange={handleEventChange}
-                       sx={{ backgroundColor: '#fff', mb: 2 }}
-                     >
-                       <MenuItem value="">
-                         <em>None</em>
-                       </MenuItem>
-                       {events.map(event => (
-                         <MenuItem key={event.id} value={event}>{event.name}</MenuItem>
-                       ))}
-                     </Select>
-                   </FormControl>
-                 </Box>
-
-                  ) : (
-                    <Button variant="contained" sx={{ backgroundColor: '#000', color: '#f5c000' }} onClick={handleUnfollow}>
-                      Unfollow
-                    </Button>
-                  )}
+                    )
+                  ) : null}
+                </Typography>
+                  
+                  {currentUser.id !== parseInt(id) ? (
+                    !isFollowing ? (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                        <Button
+                          variant="contained"
+                          sx={{ backgroundColor: '#000', color: '#f5c000', mb: 2 }}
+                          onClick={handleFollow}
+                        >
+                          Follow
+                        </Button>
+                        <Typography variant="body1" sx={{ color: '#000' }}>
+                          <strong>Select Event:</strong>
+                        </Typography>
+                        {/* Event Selector */}
+                        <FormControl fullWidth>
+                          <InputLabel id="event-selector-label">Event</InputLabel>
+                          <Select
+                            labelId="event-selector-label"
+                            value={selectedEvent}
+                            onChange={handleEventChange}
+                            sx={{ backgroundColor: '#fff', mb: 2 }}
+                          >
+                            <MenuItem value="">
+                              <em>None</em>
+                            </MenuItem>
+                            {events.map(event => (
+                              <MenuItem key={event.id} value={event}>
+                                {event.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        sx={{ backgroundColor: '#000', color: '#f5c000' }}
+                        onClick={handleUnfollow}
+                      >
+                        Unfollow
+                      </Button>
+                    )
+                  ) : null}
                 </Box>
                 <Grid container spacing={2} sx={{ mt: 2 }}>
                   <Grid item xs={12}>
@@ -138,11 +153,6 @@ function UserDetails() {
                   <Grid item xs={12}>
                     <Typography variant="body1" sx={{ color: '#000' }}>
                       <strong>Age:</strong> {user.age || 'Unknown'}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="body1" sx={{ color: '#000' }}>
-                      <strong>Friends Count:</strong> {friends.length}
                     </Typography>
                   </Grid>
                 </Grid>
