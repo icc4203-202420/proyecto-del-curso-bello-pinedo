@@ -11,17 +11,11 @@ function EventPictureUpload() {
   const [success, setSuccess] = useState('');  // Estado para manejar éxito
   const [barId, setBarId] = useState(null);  // Estado para almacenar el bar_id
   const navigate = useNavigate();  // Navegación después de la subida
-  const token = localStorage.getItem('token');  // Obtén el token JWT desde localStorage
 
   useEffect(() => {
-    // Fetch event details to get the bar_id
-    axiosInstance.get(`/events/${id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,  // Incluye el token en los headers
-      },
-    })
+    axiosInstance.get(`/events/${id}`)
       .then((res) => {
-        const eventData = res.data.event;  // Accede al objeto "event"
+        const eventData = res.data.event;
         if (eventData && eventData.bar_id) {
           setBarId(eventData.bar_id);  // Guardar el bar_id del evento
         } else {
@@ -32,7 +26,7 @@ function EventPictureUpload() {
         console.error('Error fetching event:', error);
         setError('Error fetching event details.');
       });
-  }, [id, token]);
+  }, [id]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -42,25 +36,24 @@ function EventPictureUpload() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!file) {
       setError('Please select a file.');
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('image', file);
-
+  
     setLoading(true);
-
+  
     try {
       const response = await axiosInstance.post(`/bars/${barId}/events/${id}/images`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`,  // Incluye el token en los headers
         },
       });
-
+  
       if (response.status === 201) {
         setSuccess('Image uploaded successfully!');
         setFile(null);
