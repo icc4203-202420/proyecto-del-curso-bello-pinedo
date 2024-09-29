@@ -46,19 +46,6 @@ class API::V1::EventsController < ApplicationController
     head :no_content
   end
 
-  def show_images
-    event = Event.find(params[:id])
-    images = event.event_pictures.map do |event_picture|
-      {
-        id: event_picture.id,
-        url: url_for(event_picture.image),
-        thumbnail_url: event_picture.image.variant(resize: "100x100").processed.url
-      }
-    end
-
-    render json: { images: images }, status: :ok
-  end
-
   private
 
   def set_event

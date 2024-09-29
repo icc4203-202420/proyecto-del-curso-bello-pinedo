@@ -23,7 +23,6 @@ Rails.application.routes.draw do
       resources :bars do
         resources :events do
           resources :images, only: [:create, :index], controller: 'event_pictures'
-          get 'images', to: 'event_pictures#show_images', on: :member
         end
       end
       resources :beers do
