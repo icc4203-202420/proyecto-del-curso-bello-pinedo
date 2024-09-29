@@ -33,4 +33,8 @@ class User < ApplicationRecord
   def generate_jwt
     Warden::JWTAuth::UserEncoder.new.call(self, :user, nil)[0]
   end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
 end
