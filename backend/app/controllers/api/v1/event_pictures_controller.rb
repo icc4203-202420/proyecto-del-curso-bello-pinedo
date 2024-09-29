@@ -1,21 +1,19 @@
 class API::V1::EventPicturesController < ApplicationController
-  include Authenticable  # Incluir el módulo que gestiona la autenticación JWT
-  before_action :set_user  # Configurar el current_user basado en el JWT
-  before_action :verify_jwt_token  # Verificar la validez del token JWT
   before_action :set_event
+  before_action :set_event_picture, only: [:show, :tag_user]
 
   def index
     pictures = @event.event_pictures.map do |picture|
       {
         id: picture.id,
-        url: url_for(picture.picture), # Asegúrate de usar el nombre correcto del campo de la imagen
-        thumbnail_url: url_for(picture.picture.variant(resize: "100x100"))
+        url: url_for(picture.picture),
+        thumbnail_url: url_for(picture.picture.variant(resize: "100x100")) 
       }
     end
 
     render json: { images: pictures }, status: :ok
   end
-
+  
   def show_images
     if @event.event_pictures.attached?
       pictures = @event.event_pictures.map do |picture|
@@ -32,22 +30,34 @@ class API::V1::EventPicturesController < ApplicationController
   end
 
   def create
-    event_picture = @event.event_pictures.new(user: current_user) # Asocia la imagen al usuario actual
-    
-    # Intenta adjuntar la imagen
-    if params[:image].present?
-      event_picture.picture.attach(params[:image])
-    else
-      render json: { errors: ['No image file provided'] }, status: :unprocessable_entity and return
-    end
+    # Suponiendo que el 'current_user' está configurado correctamente.
+    user = current_user || User.first  
+    event_picture = @event.event_pictures.new(picture: event_picture_params[:image], user: user)
 
-    # Intenta guardar el modelo
     if event_picture.save
       render json: { message: 'Image uploaded successfully' }, status: :created
     else
-      # Imprime los errores detallados en el registro del servidor y devuelve los errores en la respuesta
-      logger.error("Failed to save event picture: #{event_picture.errors.full_messages}")
+      Rails.logger.error("Failed to save event picture: #{event_picture.errors.full_messages}")
       render json: { errors: event_picture.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def show
+    render json: {
+      id: @event_picture.id,
+      url: url_for(@event_picture.picture),
+      user: { id: @event_picture.user.id, name: @event_picture.user.name },
+      tags: @event_picture.tagged_users.pluck(:handle) 
+    }
+  end
+
+  def tag_user
+    user = User.find(params[:user_id])
+    if @event_picture.tagged_users.include?(user)
+      render json: { message: "User already tagged" }, status: :unprocessable_entity
+    else
+      @event_picture.tagged_users << user
+      render json: { message: "User tagged successfully" }, status: :ok
     end
   end
 
@@ -55,5 +65,13 @@ class API::V1::EventPicturesController < ApplicationController
 
   def set_event
     @event = Event.find(params[:event_id])
+  end
+
+  def event_picture_params
+    params.permit(:image)
+  end
+
+  def set_event_picture
+    @event_picture = @event.event_pictures.find(params[:id])
   end
 end
