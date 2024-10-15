@@ -1,12 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
 
 const HomeScreen = () => {
+  const [bars, setBars] = useState([]); // Initial state is an empty array
+  const [loading, setLoading] = useState(true);
+
+  // Function to fetch bars from the API
+  const fetchBars = async () => {
+    setLoading(true);  // Set loading state to true when fetching starts
+  
+    try {
+      const response = await fetch('https://1ff0-200-124-48-32.ngrok-free.app/api/v1/bars', {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      // Check if the response was successful (status 200)
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      // Log the raw response and the parsed data for debugging
+      console.log('Raw Response:', response);
+      console.log('API Response:', data);
+  
+      // Access the bars array within the response
+      if (data && Array.isArray(data.bars)) {
+        setBars(data.bars); // Set the bars state to the retrieved array
+      } else {
+        console.error('Expected an array of bars but got:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching bars:', error);
+    } finally {
+      setLoading(false);  // Set loading state to false after fetching
+    }
+  };
+  
+  useEffect(() => {
+    fetchBars(); // Call the function to fetch bars when the component mounts
+  }, []);  
+
+  useEffect(() => {
+    console.log("Bars state:", bars);  // Log the bars state after it's updated
+  }, [bars]);
+  
+
   return (
     <View style={styles.container}>
-
-      <ScrollView style={styles.content}>0--0-
+      <ScrollView style={styles.content}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Popular Now</Text>
         </View>
@@ -20,20 +69,19 @@ const HomeScreen = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Most visited Bars</Text>
-          <View style={styles.barCard}>
-            <Icon name="map-marker" size={20} color="#000" />
-            <View>
-              <Text style={styles.barName}>Oculto Beergarden</Text>
-              <Text style={styles.eventDescription}>Descripcion de evento</Text>
-            </View>
-          </View>
-          <View style={styles.barCard}>
-            <Icon name="map-marker" size={20} color="#000" />
-            <View>
-              <Text style={styles.barName}>Barba Azul Apoquindo</Text>
-              <Text style={styles.eventDescription}>Descripcion de evento</Text>
-            </View>
-          </View>
+          {loading ? (
+            <Text style={{ color: '#fff' }}>Loading...</Text>
+          ) : (
+            bars.map((bar) => (
+              <View key={bar.id} style={styles.barCard}>
+                <Icon name="map-marker" size={20} color="#000" />
+                <View>
+                  <Text style={styles.barName}>{bar.name}</Text>
+                  <Text style={styles.eventDescription}>Description of the event</Text>
+                </View>
+              </View>
+            ))
+          )}
         </View>
 
         <View style={styles.section}>
@@ -42,7 +90,7 @@ const HomeScreen = () => {
             <Icon name="fire" size={20} color="#000" />
             <View>
               <Text style={styles.barName}>Cata a ciegas</Text>
-              <Text style={styles.eventDescription}>Descripcion de evento</Text>
+              <Text style={styles.eventDescription}>Description of the event</Text>
             </View>
           </View>
         </View>
@@ -53,21 +101,15 @@ const HomeScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1E1E1E' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: '#f5c000' },
-
   content: { flex: 1, padding: 15 },
   section: { marginBottom: 20 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#f5c000' },
-  eventImage: { width: '100%', height: 150, borderRadius: 10 },
-
   searchContainer: { flexDirection: 'row', marginBottom: 20 },
   searchInput: { flex: 1, backgroundColor: '#FFF', padding: 10, borderRadius: 5 },
   searchButton: { marginLeft: 10, padding: 10, backgroundColor: '#f5c000', borderRadius: 5 },
-
   barCard: { flexDirection: 'row', padding: 15, backgroundColor: '#f5c000', marginBottom: 10, borderRadius: 10 },
   barName: { fontSize: 16, fontWeight: 'bold', marginLeft: 10 },
   eventDescription: { fontSize: 14, marginLeft: 10 },
-
   trendingEvent: { flexDirection: 'row', padding: 15, backgroundColor: '#f5c000', borderRadius: 10 },
 });
 
