@@ -1,19 +1,43 @@
 import React from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import HomeNavigation from "./src/Home/navigation/HomeNavigation";
-import BeersSearch from './src/Beers/screens/BeerSearch'; // Pantalla de búsqueda de cervezas
-import BeerDetails from './src/Beers/screens/BeersDetails'; // Pantalla de detalles de una cerveza
+import HomeNavigation from "./src/Home/navigation/HomeNavigation"; // Importa HomeNavigation
+import BeersSearch from "./src/Beers/screens/BeerSearch";  // Pantalla de búsqueda de cervezas
+import BeerDetails from "./src/Beers/screens/BeersDetails";
+import SignIn from "./src/User/screens/SignIn";
+import SignUp from "./src/User/screens/SignUp";
+const Stack = createNativeStackNavigator();
 
-// Crear el Stack Navigator
-const Stack = createStackNavigator();
+function Footer() {
+  const navigation = useNavigation(); // Usar useNavigation para la navegación
+  return (
+    <View style={styles.footer}>
+      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Home')}>
+        <Icon name="home" size={24} color="#000" />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Store')}>
+        <Icon name="store" size={24} color="#000" />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Calendar')}>
+        <Icon name="calendar" size={24} color="#000" />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BeersSearch')}>
+        <Icon name="search" size={24} color="#000" />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('SignIn')}>
+        <Icon name="user" size={24} color="#000" />
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 function App() {
   return (
     <NavigationContainer>
       <View style={styles.container}>
+        {/* Encabezado */}
         <View style={styles.header}>
           <Image source={require('./assets/beer-icon.png')} style={styles.logo} />
           <Text style={styles.headerTitle}>BeerMark</Text>
@@ -22,32 +46,15 @@ function App() {
           </TouchableOpacity>
         </View>
 
-        {/* Configuración de Stack Navigator */}
+        {/* Stack Navigator */}
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen name="Home" component={HomeNavigation} options={{ headerShown: false }} />
-          <Stack.Screen name="BeersSearch" component={Beers} options={{ title: 'Search Beers' }} />
+          <Stack.Screen name="BeersSearch" component={BeersSearch} options={{ title: 'Search Beers' }} />
           <Stack.Screen name="BeerDetails" component={BeerDetails} options={{ title: 'Beer Details' }} />
         </Stack.Navigator>
 
         {/* Footer con navegación */}
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton}>
-            <Icon name="home" size={24} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton}>
-            <Icon name="store" size={24} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton}>
-            <Icon name="calendar" size={24} color="#000" />
-          </TouchableOpacity>
-          {/* Navegar a BeersSearch al presionar el ícono de búsqueda */}
-          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BeersSearch')}>
-            <Icon name="search" size={24} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton}>
-            <Icon name="user" size={24} color="#000" />
-          </TouchableOpacity>
-        </View>
+        <Footer />  {/* Usamos el Footer dentro del mismo layout */}
       </View>
     </NavigationContainer>
   );

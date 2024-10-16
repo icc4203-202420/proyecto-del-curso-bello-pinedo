@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
+import axiosInstance from '../../PageElements/axiosInstance';
 
 const HomeScreen = () => {
-  const [bars, setBars] = useState([]); // Initial state is an empty array
+  const [bars, setBars] = useState([]); 
   const [loading, setLoading] = useState(true);
 
-  // Function to fetch bars from the API
   const fetchBars = async () => {
-    setLoading(true);  // Set loading state to true when fetching starts
+    setLoading(true);  
   
     try {
       const response = await fetch('https://1ff0-200-124-48-32.ngrok-free.app/api/v1/bars', {
@@ -20,14 +19,12 @@ const HomeScreen = () => {
         },
       });
   
-      // Check if the response was successful (status 200)
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
   
       const data = await response.json();
   
-      // Log the raw response and the parsed data for debugging
       console.log('Raw Response:', response);
       console.log('API Response:', data);
   

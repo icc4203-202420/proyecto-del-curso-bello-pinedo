@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import axiosInstance from '../PageElements/axiosInstance';  // Ajustada a la estructura del proyecto
+import axiosInstance from '../../PageElements/axiosInstance';
 
 function BeersSearch() {
   const [searchKeywords, setSearchKeywords] = useState('');
@@ -22,18 +22,26 @@ function BeersSearch() {
     axiosInstance
       .get(`/beers?query=${searchKeywords}`)
       .then((response) => {
-        setSearchResults(response.data.beers);
+        if (response.data && response.data.beers) {
+          setSearchResults(response.data.beers);
+        } else {
+          setSearchResults([]);  // Si no hay cervezas
+        }
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error fetching beers:', error);  // Log del error
         setError('Error loading data.');
         setLoading(false);
       });
   };
-
+  
+  
   const handleSearch = (text) => {
+    console.log('Search keyword:', text);  // Log para ver el valor ingresado
     setSearchKeywords(text);
   };
+  
 
   const renderBeerItem = ({ item }) => (
     <TouchableOpacity
@@ -44,6 +52,7 @@ function BeersSearch() {
       <Text style={styles.beerStyle}>Style: {item.style}</Text>
     </TouchableOpacity>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -67,7 +76,7 @@ function BeersSearch() {
           data={searchResults}
           renderItem={renderBeerItem}
           keyExtractor={(item) => item.id.toString()}
-          ListEmptyComponent={<Text style={styles.noResults}>No results found.</Text>}
+          ListEmptyComponent={<Text style={styles.noResults}>No results found. Try different keywords.</Text>}
         />
       )}
     </View>
