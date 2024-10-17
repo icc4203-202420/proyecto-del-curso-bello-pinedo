@@ -53,8 +53,7 @@ function App() {
           <Stack.Screen name="BeerDetails" component={BeerDetails} options={{ title: 'Beer Details' }} />
         </Stack.Navigator>
 
-        {/* Footer con navegación */}
-        <Footer />  {/* Usamos el Footer dentro del mismo layout */}
+        <Footer />  
       </View>
     </NavigationContainer>
   );

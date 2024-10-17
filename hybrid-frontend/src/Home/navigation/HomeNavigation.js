@@ -16,31 +16,76 @@ const HomeNavigation = () => {
       <CoreStack.Screen
         name="SignIn"
         component={SignIn}
-        options={{ title: 'Sign In', headerShown: false }}
+        options={{ 
+          title: '',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
+          },
+          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+         }}
       />
       {/* Pantalla de Registro */}
       <CoreStack.Screen
         name="SignUp"
         component={SignUp}
-        options={{ title: 'Sign Up', headerShown: false }}
+        options={{ 
+          title: '',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
+          },
+          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+         }}
       />
       {/* Pantalla Principal (Home) */}
       <CoreStack.Screen
         name="Home"
         component={HomeScreen}
-        options={{ headerShown: false }}
+        options={{ 
+          title: '',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
+          },
+          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+         }}
       />
       {/* Pantalla de Búsqueda de Cervezas */}
       <CoreStack.Screen
         name="BeersSearch"
         component={BeersSearch}
-        options={{ title: 'Search Beers' }}
+        options={{ 
+          title: '',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
+          },
+          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+         }}
       />
       {/* Pantalla de Detalles de una Cerveza */}
       <CoreStack.Screen
         name="BeerDetails"
         component={BeerDetails}
-        options={{ title: 'Beer Details' }}
+        options={{ 
+          title: '',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
+          },
+          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+         }}
       />
     </CoreStack.Navigator>
   );

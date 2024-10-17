@@ -5,43 +5,48 @@ import axiosInstance from '../../PageElements/axiosInstance';
 
 function BeersSearch() {
   const [searchKeywords, setSearchKeywords] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [beers, setBeers] = useState([]);  
+  const [filteredBeers, setFilteredBeers] = useState([]);  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigation = useNavigation();
 
-  // Fetch beers from API
   useEffect(() => {
-    if (searchKeywords !== '') {
-      fetchBeers();
-    }
-  }, [searchKeywords]);
+    fetchAllBeers();
+  }, []);
 
-  const fetchBeers = () => {
+  const fetchAllBeers = () => {
     setLoading(true);
     axiosInstance
-      .get(`/beers?query=${searchKeywords}`)
+      .get('/beers')
       .then((response) => {
         if (response.data && response.data.beers) {
-          setSearchResults(response.data.beers);
+          setBeers(response.data.beers);  
+          setFilteredBeers(response.data.beers);  
         } else {
-          setSearchResults([]);  // Si no hay cervezas
+          setBeers([]);
+          setFilteredBeers([]);
         }
         setLoading(false);
       })
       .catch((error) => {
-        console.error('Error fetching beers:', error);  // Log del error
+        console.error('Error fetching beers:', error);
         setError('Error loading data.');
         setLoading(false);
       });
   };
-  
-  
+
   const handleSearch = (text) => {
-    console.log('Search keyword:', text);  // Log para ver el valor ingresado
     setSearchKeywords(text);
+    if (text === '') {
+      setFilteredBeers(beers);  
+    } else {
+      const filtered = beers.filter(beer =>
+        beer.name.toLowerCase().includes(text.toLowerCase())  
+      );
+      setFilteredBeers(filtered);
+    }
   };
-  
 
   const renderBeerItem = ({ item }) => (
     <TouchableOpacity
@@ -52,13 +57,11 @@ function BeersSearch() {
       <Text style={styles.beerStyle}>Style: {item.style}</Text>
     </TouchableOpacity>
   );
-  
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Beers</Text>
 
-      {/* Barra de búsqueda */}
       <TextInput
         style={styles.searchInput}
         placeholder="Search Beers"
@@ -66,14 +69,13 @@ function BeersSearch() {
         onChangeText={handleSearch}
       />
 
-      {/* Lista de cervezas */}
       {loading ? (
         <ActivityIndicator size="large" color="#f5c000" />
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
       ) : (
         <FlatList
-          data={searchResults}
+          data={filteredBeers} 
           renderItem={renderBeerItem}
           keyExtractor={(item) => item.id.toString()}
           ListEmptyComponent={<Text style={styles.noResults}>No results found. Try different keywords.</Text>}
@@ -87,7 +89,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
   },
   title: {
     fontSize: 24,

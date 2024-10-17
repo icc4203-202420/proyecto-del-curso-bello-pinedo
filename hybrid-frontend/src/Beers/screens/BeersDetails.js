@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, Button, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Rating } from 'react-native-ratings'; // Usar react-native-ratings para el sistema de rating
+import axiosInstance from '../../PageElements/axiosInstance'; // Asegúrate de tener configurado axiosInstance
 
 function BeerDetails() {
   const [beer, setBeer] = useState(null);  // Estado para manejar la cerveza
@@ -11,8 +12,6 @@ function BeerDetails() {
   const [success, setSuccess] = useState('');  // Estado para manejar el mensaje de éxito
   const [reviews, setReviews] = useState([]);  // Estado para manejar las reseñas de otros usuarios
   const { id } = useRoute().params;  // Obtener id desde los parámetros de la ruta
-  const storedUser = localStorage.getItem('currentUser');
-  const currentUser = storedUser ? JSON.parse(storedUser) : null;
   const navigation = useNavigation();
 
   // Fetch beer details
@@ -37,10 +36,6 @@ function BeerDetails() {
   };
 
   const handleSubmit = () => {
-    if (!currentUser) {
-      setError('You must be logged in to submit a review.');
-      return;
-    }
     const wordCount = comment.trim().split(/\s+/).length;
 
     if (wordCount < 15) {
@@ -55,6 +50,9 @@ function BeerDetails() {
 
     setError('');
 
+    // Suponemos que hay un `currentUser` ya identificado en tu app.
+    const currentUser = { id: 1 };  // Cambia esto para que coincida con tu flujo de autenticación real.
+
     axiosInstance.post(`/users/${currentUser.id}/reviews`, {
       beer_id: id,
       rating: rating,
@@ -64,6 +62,8 @@ function BeerDetails() {
         setSuccess('Review submitted successfully!');
         setRating(0);
         setComment('');
+        // Refrescar las reviews después de enviar
+        setReviews(prev => [...prev, { rating, text: comment, user_id: currentUser.id }]);
       })
       .catch(() => {
         setError('Error submitting the review. Please try again.');
@@ -85,19 +85,25 @@ function BeerDetails() {
         <Text style={styles.title}>{beer.name}</Text>
         <Text style={styles.brewery}>Brewery: {beer.breweries && beer.breweries.length > 0 ? beer.breweries[0].name : 'Unknown'}</Text>
         <Text style={styles.details}>Style: {beer.style || 'Unknown'}</Text>
-        <Text style={styles.details}>Rating: {beer.avg_rating || 'Unknown'}</Text>
+        <Text style={styles.details}>Rating: {beer.avg_rating || 'No rating yet'}</Text>
       </View>
 
       {/* Rating */}
       <View style={styles.card}>
         <Text style={styles.subtitle}>Rate this beer:</Text>
 
-        <Rating
-          showRating
-          startingValue={rating}
-          onFinishRating={handleRatingChange}
-          style={styles.rating}
-        />
+        <View style={styles.ratingContainer}>
+          <Rating
+            showRating
+            startingValue={rating}
+            onFinishRating={handleRatingChange}
+            style={styles.rating}
+            ratingColor="#000"  // Color de las estrellas llenas (negras)
+            ratingBackgroundColor="#000"  // Color de las estrellas vacías (blancas)
+            ratingCount={5}  // Número total de estrellas
+            imageSize={50}  // Tamaño de las estrellas
+          />
+        </View>
 
         <TextInput
           style={styles.input}
@@ -116,8 +122,8 @@ function BeerDetails() {
       <View style={styles.card}>
         <Text style={styles.subtitle}>Reviews</Text>
         {reviews.length > 0 ? (
-          reviews.map((review) => (
-            <View key={review.id} style={styles.reviewCard}>
+          reviews.map((review, index) => (
+            <View key={index} style={styles.reviewCard}>
               <Text style={styles.reviewText}>Rating: {review.rating}</Text>
               <Text style={styles.reviewText}>Comment: {review.text}</Text>
               <Text style={styles.reviewText}>Posted by: {review.user_id || 'Unknown'}</Text>
@@ -138,13 +144,14 @@ function BeerDetails() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 20, backgroundColor: '#1E1E1E' },
   card: { backgroundColor: '#f5c000', padding: 20, borderRadius: 10, marginBottom: 20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   brewery: { fontSize: 16, marginBottom: 5 },
   details: { fontSize: 14, marginBottom: 5 },
   subtitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  rating: { paddingVertical: 10 },
+  rating: { paddingVertical: 30 },
+  ratingContainer: { backgroundColor: '#000', padding: 20, borderRadius: 10 },  // Fondo negro para el componente de rating
   input: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10, borderColor: '#ccc', borderWidth: 1 },
   error: { color: 'red', marginBottom: 10 },
   success: { color: 'green', marginBottom: 10 },
