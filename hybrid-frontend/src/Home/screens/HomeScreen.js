@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axiosInstance from '../../PageElements/axiosInstance';
+import { NGROK_URL } from '@env';
 
 const HomeScreen = () => {
   const [bars, setBars] = useState([]); 
@@ -11,7 +12,7 @@ const HomeScreen = () => {
     setLoading(true);  
   
     try {
-      const response = await fetch('http://localhost:3000/api/v1/bars', {
+      const response = await fetch(`${NGROK_URL}/api/v1/bars`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
