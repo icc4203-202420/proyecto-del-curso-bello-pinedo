@@ -4,6 +4,9 @@ import axiosInstance from '../../PageElements/axiosInstance';
 
 function SignUp({ navigation }) {
   const [email, setEmail] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [handle, setHandle] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,8 +18,8 @@ function SignUp({ navigation }) {
     }
 
     setLoading(true);
-
-    axiosInstance.post('/signup', { email, password })
+    const user = {"user": {first_name: firstname, last_name: lastname, handle: handle, email: email, password: password, password_confirmation: confirmPassword }};
+    axiosInstance.post('/signup', user)
       .then((response) => {
         setLoading(false);
         Alert.alert('Success', 'Account created successfully!');
@@ -39,6 +42,24 @@ function SignUp({ navigation }) {
       />
       <TextInput
         style={styles.input}
+        placeholder="First Name"
+        value={firstname}
+        onChangeText={setFirstname}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        value={lastname}
+        onChangeText={setLastname}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Handle"
+        value={handle}
+        onChangeText={setHandle}
+      />
+      <TextInput
+        style={styles.input}
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
@@ -55,14 +76,14 @@ function SignUp({ navigation }) {
       {loading ? (
         <ActivityIndicator size="large" color="#f5c000" />
       ) : (
-        <Button title="Sign Up" onPress={handleSignUp} />
+        <Button title="Sign Up" onPress={handleSignUp}  />
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff', justifyContent: 'center' },
+  container: { flex: 1, padding: 20, backgroundColor: '#1E1E1E', justifyContent: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: '#f5c000' },
   input: { backgroundColor: '#f5f5f5', padding: 10, borderRadius: 8, borderColor: '#ccc', borderWidth: 1, marginBottom: 20 },
 });

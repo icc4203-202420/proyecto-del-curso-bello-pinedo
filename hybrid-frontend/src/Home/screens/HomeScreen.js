@@ -11,7 +11,7 @@ const HomeScreen = () => {
     setLoading(true);  
   
     try {
-      const response = await fetch('https://1ff0-200-124-48-32.ngrok-free.app/api/v1/bars', {
+      const response = await fetch('http://localhost:3000/api/v1/bars', {
         method: 'GET',
         headers: {
           Accept: 'application/json',

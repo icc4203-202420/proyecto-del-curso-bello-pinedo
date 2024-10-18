@@ -17,14 +17,14 @@ function Footer() {
       <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Home')}>
         <Icon name="home" size={24} color="#000" />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Store')}>
-        <Icon name="store" size={24} color="#000" />
+      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Bar')}>
+        <Icon name="shopping-basket" size={24} color="#000" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Calendar')}>
         <Icon name="calendar" size={24} color="#000" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BeersSearch')}>
-        <Icon name="search" size={24} color="#000" />
+        <Icon name="beer" size={24} color="#000" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('SignIn')}>
         <Icon name="user" size={24} color="#000" />
@@ -41,9 +41,6 @@ function App() {
         <View style={styles.header}>
           <Image source={require('./assets/beer-icon.png')} style={styles.logo} />
           <Text style={styles.headerTitle}>BeerMark</Text>
-          <TouchableOpacity>
-            <Text style={styles.logoutButton}>LOG OUT</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Stack Navigator */}

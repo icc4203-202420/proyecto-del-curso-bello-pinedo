@@ -60,7 +60,6 @@ function BeersSearch() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Beers</Text>
 
       <TextInput
         style={styles.searchInput}

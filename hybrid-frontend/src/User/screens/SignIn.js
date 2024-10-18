@@ -9,8 +9,9 @@ function SignIn({ navigation }) {
 
   const handleSignIn = () => {
     setLoading(true);
+    const user = {"user": { email: email, password: password }};
 
-    axiosInstance.post('/login', { email, password })
+    axiosInstance.post('/login', user)
       .then((response) => {
         setLoading(false);
         const token = response.data.token;  // Suponiendo que el backend te devuelve un token JWT
@@ -57,10 +58,10 @@ function SignIn({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff', justifyContent: 'center' },
+  container: { flex: 1, padding: 20, backgroundColor: '#1E1E1E', justifyContent: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: '#f5c000' },
   input: { backgroundColor: '#f5f5f5', padding: 10, borderRadius: 8, borderColor: '#ccc', borderWidth: 1, marginBottom: 20 },
-  signUpText: { textAlign: 'center', marginTop: 20 },
+  signUpText: { textAlign: 'center', marginTop: 20, color: '#f5c000' },
   signUpLink: { color: '#f5c000', fontWeight: 'bold' },
 });
 

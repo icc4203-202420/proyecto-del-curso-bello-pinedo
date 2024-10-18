@@ -17,7 +17,7 @@ const HomeNavigation = () => {
         name="SignIn"
         component={SignIn}
         options={{ 
-          title: '',
+          title: 'Sign In',
           headerStyle: {
             backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
           },
@@ -25,6 +25,7 @@ const HomeNavigation = () => {
           headerTitleStyle: {
             fontWeight: 'bold',  // Ajusta el estilo del texto del título
           },
+          headerShown: false,  // Oculta la barra de navegación
          }}
       />
       {/* Pantalla de Registro */}
@@ -32,7 +33,7 @@ const HomeNavigation = () => {
         name="SignUp"
         component={SignUp}
         options={{ 
-          title: '',
+          title: 'SignUp',
           headerStyle: {
             backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
           },
@@ -40,6 +41,7 @@ const HomeNavigation = () => {
           headerTitleStyle: {
             fontWeight: 'bold',  // Ajusta el estilo del texto del título
           },
+          headerShown: false, 
          }}
       />
       {/* Pantalla Principal (Home) */}
@@ -47,14 +49,17 @@ const HomeNavigation = () => {
         name="Home"
         component={HomeScreen}
         options={{ 
-          title: '',
+          title: 'Home',
           headerStyle: {
             backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
           },
-          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTintColor: '#f5c000',  // Cambia el color de la flecha y el texto
           headerTitleStyle: {
-            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+            fontWeight: 'bold',
+              // Ajusta el estilo del texto del título
           },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
          }}
       />
       {/* Pantalla de Búsqueda de Cervezas */}
@@ -62,14 +67,16 @@ const HomeNavigation = () => {
         name="BeersSearch"
         component={BeersSearch}
         options={{ 
-          title: '',
+          title: 'Beers',
           headerStyle: {
             backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
           },
-          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTintColor: '#f5c000',  // Cambia el color de la flecha y el texto
           headerTitleStyle: {
             fontWeight: 'bold',  // Ajusta el estilo del texto del título
           },
+          headerShadowVisible: false, 
+          headerTitleAlign: 'center', // Oculta la sombra de la barra
          }}
       />
       {/* Pantalla de Detalles de una Cerveza */}
@@ -77,14 +84,16 @@ const HomeNavigation = () => {
         name="BeerDetails"
         component={BeerDetails}
         options={{ 
-          title: '',
+          title: 'Beer Details',
           headerStyle: {
             backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
           },
-          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTintColor: '#f5c000',  // Cambia el color de la flecha y el texto
           headerTitleStyle: {
             fontWeight: 'bold',  // Ajusta el estilo del texto del título
           },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
          }}
       />
     </CoreStack.Navigator>

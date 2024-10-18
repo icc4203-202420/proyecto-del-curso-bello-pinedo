@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, Button, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Rating } from 'react-native-ratings'; // Usar react-native-ratings para el sistema de rating
-import axiosInstance from '../../PageElements/axiosInstance'; // Asegúrate de tener configurado axiosInstance
+import { Rating } from 'react-native-ratings'; 
+import Slider from '@react-native-community/slider';  // Import Slider
+import axiosInstance from '../../PageElements/axiosInstance'; 
 
 function BeerDetails() {
-  const [beer, setBeer] = useState(null);  // Estado para manejar la cerveza
-  const [rating, setRating] = useState(0);  // Estado para manejar el rating
-  const [comment, setComment] = useState('');  // Estado para manejar el comentario
-  const [error, setError] = useState('');  // Estado para manejar mensajes de error
-  const [success, setSuccess] = useState('');  // Estado para manejar el mensaje de éxito
-  const [reviews, setReviews] = useState([]);  // Estado para manejar las reseñas de otros usuarios
-  const { id } = useRoute().params;  // Obtener id desde los parámetros de la ruta
+  const [beer, setBeer] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [reviews, setReviews] = useState([]);
+  const { id } = useRoute().params;
   const navigation = useNavigation();
+  const [customValue, setCustomValue] = useState(0); // State for custom slider
 
-  // Fetch beer details
   useEffect(() => {
     axiosInstance.get(`/beers/${id}`)
       .then((res) => {
@@ -50,8 +51,7 @@ function BeerDetails() {
 
     setError('');
 
-    // Suponemos que hay un `currentUser` ya identificado en tu app.
-    const currentUser = { id: 1 };  // Cambia esto para que coincida con tu flujo de autenticación real.
+    const currentUser = { id: 1 }; 
 
     axiosInstance.post(`/users/${currentUser.id}/reviews`, {
       beer_id: id,
@@ -62,7 +62,6 @@ function BeerDetails() {
         setSuccess('Review submitted successfully!');
         setRating(0);
         setComment('');
-        // Refrescar las reviews después de enviar
         setReviews(prev => [...prev, { rating, text: comment, user_id: currentUser.id }]);
       })
       .catch(() => {
@@ -88,20 +87,16 @@ function BeerDetails() {
         <Text style={styles.details}>Rating: {beer.avg_rating || 'No rating yet'}</Text>
       </View>
 
-      {/* Rating */}
       <View style={styles.card}>
         <Text style={styles.subtitle}>Rate this beer:</Text>
-
         <View style={styles.ratingContainer}>
           <Rating
             showRating
             startingValue={rating}
             onFinishRating={handleRatingChange}
             style={styles.rating}
-            ratingColor="#000"  // Color de las estrellas llenas (negras)
-            ratingBackgroundColor="#000"  // Color de las estrellas vacías (blancas)
-            ratingCount={5}  // Número total de estrellas
-            imageSize={50}  // Tamaño de las estrellas
+            ratingCount={5}
+            imageSize={50}
           />
         </View>
 
@@ -115,10 +110,11 @@ function BeerDetails() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
         {success ? <Text style={styles.success}>{success}</Text> : null}
 
-        <Button title="Submit Review" onPress={handleSubmit} />
+        <View style={styles.buttonContainer}>
+          <Button title="Submit Review" color="#1E1E1E" onPress={handleSubmit} />
+        </View>
       </View>
 
-      {/* Reviews */}
       <View style={styles.card}>
         <Text style={styles.subtitle}>Reviews</Text>
         {reviews.length > 0 ? (
@@ -134,11 +130,13 @@ function BeerDetails() {
         )}
       </View>
 
-      {/* Botón para ver los bares */}
-      <Button
-        title="Where to Find It"
-        onPress={() => navigation.navigate('BeerBars', { beerId: beer.id })}
-      />
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Where to Find It"
+          color="#f5c000"
+          onPress={() => navigation.navigate('BeerBars', { beerId: beer.id })}
+        />
+      </View>
     </ScrollView>
   );
 }
@@ -150,15 +148,15 @@ const styles = StyleSheet.create({
   brewery: { fontSize: 16, marginBottom: 5 },
   details: { fontSize: 14, marginBottom: 5 },
   subtitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  rating: { paddingVertical: 30 },
-  ratingContainer: { backgroundColor: '#000', padding: 20, borderRadius: 10 },  // Fondo negro para el componente de rating
-  input: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10, borderColor: '#ccc', borderWidth: 1 },
+  ratingContainer: { backgroundColor: '#1E1E1E', padding: 5, borderRadius: 10 },
+  input: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10, borderColor: '#ccc', borderWidth: 1 , marginTop: 10},
   error: { color: 'red', marginBottom: 10 },
   success: { color: 'green', marginBottom: 10 },
-  reviewCard: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10 },
+  reviewCard: { backgroundColor: '#1E1E1E', padding: 10, borderRadius: 5, marginBottom: 10 },
   reviewText: { fontSize: 14, color: '#000' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingText: { marginTop: 10, fontSize: 18, color: '#000' },
+  buttonContainer: { marginTop: 10 },
 });
 
 export default BeerDetails;
