@@ -10,29 +10,6 @@ import SignIn from "./src/User/screens/SignIn";
 import SignUp from "./src/User/screens/SignUp";
 const Stack = createNativeStackNavigator();
 
-function Footer() {
-  const navigation = useNavigation(); // Usar useNavigation para la navegación
-  return (
-    <View style={styles.footer}>
-      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Home')}>
-        <Icon name="home" size={24} color="#000" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Bar')}>
-        <Icon name="shopping-basket" size={24} color="#000" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Calendar')}>
-        <Icon name="calendar" size={24} color="#000" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BeersSearch')}>
-        <Icon name="beer" size={24} color="#000" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('SignIn')}>
-        <Icon name="user" size={24} color="#000" />
-      </TouchableOpacity>
-    </View>
-  );
-}
-
 function App() {
   return (
     <NavigationContainer>
@@ -49,8 +26,6 @@ function App() {
           <Stack.Screen name="BeersSearch" component={BeersSearch} options={{ title: 'Search Beers' }} />
           <Stack.Screen name="BeerDetails" component={BeerDetails} options={{ title: 'Beer Details' }} />
         </Stack.Navigator>
-
-        <Footer />  
       </View>
     </NavigationContainer>
   );
@@ -63,8 +38,6 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
   logoutButton: { fontSize: 16, color: '#000' },
 
-  footer: { flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: '#f5c000' },
-  footerButton: { padding: 10 },
 });
 
 export default App;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axiosInstance from '../../PageElements/axiosInstance';
+import Footer from '../../PageElements/Footer'; 
 
 function BeersSearch() {
   const [searchKeywords, setSearchKeywords] = useState('');
@@ -59,6 +60,7 @@ function BeersSearch() {
   );
 
   return (
+    <>
     <View style={styles.container}>
 
       <TextInput
@@ -81,6 +83,8 @@ function BeersSearch() {
         />
       )}
     </View>
+    <Footer />
+    </>
   );
 }
 

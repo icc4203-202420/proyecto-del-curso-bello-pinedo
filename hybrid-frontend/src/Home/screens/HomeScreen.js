@@ -1,34 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import axiosInstance from '../../PageElements/axiosInstance';
-import { NGROK_URL } from '@env';
+import axiosInstance from '../../PageElements/axiosInstance'; // Importing axiosInstance
+import Footer from '../../PageElements/Footer'; // Importing the Footer component
+import { NavigationContainer, useRoute } from '@react-navigation/native'; // Use useRoute
 
 const HomeScreen = () => {
-  const [bars, setBars] = useState([]); 
+  const [bars, setBars] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const route = useRoute(); // Get the current route
 
   const fetchBars = async () => {
-    setLoading(true);  
-  
+    setLoading(true);
+
     try {
-      const response = await fetch(`${NGROK_URL}/api/v1/bars`, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-  
-      console.log('Raw Response:', response);
+      const response = await axiosInstance.get('/bars'); // Using axiosInstance to perform the GET request
+      const data = response.data; // Extracting data from the axios response
+
       console.log('API Response:', data);
-  
+
       // Access the bars array within the response
       if (data && Array.isArray(data.bars)) {
         setBars(data.bars); // Set the bars state to the retrieved array
@@ -38,18 +29,20 @@ const HomeScreen = () => {
     } catch (error) {
       console.error('Error fetching bars:', error);
     } finally {
-      setLoading(false);  // Set loading state to false after fetching
+      setLoading(false); // Set loading state to false after fetching
     }
   };
-  
-  useEffect(() => {
-    fetchBars(); // Call the function to fetch bars when the component mounts
-  }, []);  
 
   useEffect(() => {
-    console.log("Bars state:", bars);  // Log the bars state after it's updated
+    fetchBars(); // Call the function to fetch bars when the component mounts
+  }, []);
+
+  useEffect(() => {
+    console.log("Bars state:", bars); // Log the bars state after it's updated
   }, [bars]);
-  
+
+  // List of screens where the footer should be displayed
+  const screensWithFooter = ['Home', 'Bar', 'BeersSearch'];
 
   return (
     <View style={styles.container}>
@@ -93,6 +86,9 @@ const HomeScreen = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Conditionally render the footer */}
+      {screensWithFooter.includes(route.name) && <Footer />}
     </View>
   );
 };
