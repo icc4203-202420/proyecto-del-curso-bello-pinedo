@@ -159,7 +159,10 @@ function BeerDetails() {
             onFinishRating={handleRatingChange}
             style={styles.rating}
             ratingCount={5}
+            ratingTextColor="#1E1E1E" 
             imageSize={50}
+            tintColor="#1E1E1E"
+            selectedColor='#1E1E1E'
           />
 
           <TextInput
@@ -196,8 +199,7 @@ function BeerDetails() {
             <Text>No reviews yet.</Text>
           )}
         </View>
-
-        <Button
+        <Button style={styles.button2}
           title="Where to Find It"
           color="#f5c000"
           onPress={() => navigation.navigate('BeerBars', { beerId: beer.id })}
@@ -214,15 +216,16 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   brewery: { fontSize: 16, marginBottom: 5 },
   details: { fontSize: 14, marginBottom: 5 },
-  subtitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  rating: { backgroundColor: '#f5c000', padding: 5, borderRadius: 10 },
+  subtitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#1E1E1E' },
+  rating: {  padding: 5, borderRadius: 10 },
   input: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10, borderColor: '#ccc', borderWidth: 1 },
   error: { color: 'red', marginBottom: 10 },
   success: { color: 'green', marginBottom: 10 },
   reviewCard: { padding: 10, backgroundColor: '#fff', borderRadius: 5, marginBottom: 10 },
   reviewText: { fontSize: 14, marginBottom: 5 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E1E1E' },
-  loadingText: { marginTop: 10, color: '#f5c000' }
+  loadingText: { marginTop: 10, color: '#f5c000' },
+  button2: {marginBottom: 20},
 });
 
 export default BeerDetails;

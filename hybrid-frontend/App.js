@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity, SafeAreaView } from "react-native";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -15,10 +15,12 @@ function App() {
     <NavigationContainer>
       <View style={styles.container}>
         {/* Encabezado */}
-        <View style={styles.header}>
-          <Image source={require('./assets/beer-icon.png')} style={styles.logo} />
-          <Text style={styles.headerTitle}>BeerMark</Text>
-        </View>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.header}>
+            <Image source={require('./assets/beer-icon.png')} style={styles.logo} />
+            <Text style={styles.headerTitle}>BeerMark</Text>
+          </View>
+        </SafeAreaView>
 
         {/* Stack Navigator */}
         <Stack.Navigator initialRouteName="Home">
@@ -37,7 +39,7 @@ const styles = StyleSheet.create({
   logo: { width: 30, height: 30 },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
   logoutButton: { fontSize: 16, color: '#000' },
-
+  safeArea: {backgroundColor: '#f5c000'},
 });
 
 export default App;
