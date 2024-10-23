@@ -336,7 +336,7 @@ DEPENDENCIES
   puma (>= 5.0)
   pundit
   rack-cors
-  rails (~> 7.1.3, >= 7.1.3.4)
+  rails (~> 7.1.3)
   rails-erd
   rspec-rails
   sqlite3 (~> 1.4)
