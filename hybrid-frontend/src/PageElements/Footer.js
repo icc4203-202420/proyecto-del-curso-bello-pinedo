@@ -30,6 +30,9 @@ function Footer() {
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BeersSearch')}>
             <Icon name="beer" size={24} color="#000" />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('FriendSearch')}>
+            <Icon name="user" size={24} color="#000" />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.footerButton} onPress={handleLogout}>
             <Icon name="sign-out" size={24} color="#000" />
           </TouchableOpacity>

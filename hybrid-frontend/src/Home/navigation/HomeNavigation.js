@@ -8,6 +8,8 @@ import SignIn from "../../User/screens/SignIn";
 import SignUp from "../../User/screens/SignUp";
 import EventsSearch from "../../Events/screens/EventsSearch";
 import EventDetails from "../../Events/screens/EventsDetails";
+import FriendSearch from "../../Friends/screens/FriendSearch";
+import FriendDetails from "../../Friends/screens/FriendDetails";
 
 const CoreStack = createNativeStackNavigator();
 
@@ -122,6 +124,40 @@ const HomeNavigation = () => {
          component={EventDetails}
          options={{
           title: 'Event Details',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de
+          },
+          headerTintColor: '#f5c000',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+
+        <CoreStack.Screen
+         name="FriendSearch"
+         component={FriendSearch}
+         options={{
+          title: 'Friends',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de
+          },
+          headerTintColor: '#f5c000',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+
+        <CoreStack.Screen
+         name="FriendDetails"
+         component={FriendDetails}
+         options={{
+          title: 'Friend Add',
           headerStyle: {
             backgroundColor: '#1E1E1E',  // Cambia el color del fondo de
           },

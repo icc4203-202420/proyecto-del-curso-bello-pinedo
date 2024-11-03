@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_29_194748) do
+ActiveRecord::Schema[7.1].define(version: 2024_11_03_194530) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -157,7 +157,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_29_194748) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "bar_id"
+    t.integer "event_id"
     t.index ["bar_id"], name: "index_friendships_on_bar_id"
+    t.index ["event_id"], name: "index_friendships_on_event_id"
     t.index ["friend_id"], name: "index_friendships_on_friend_id"
     t.index ["user_id", "friend_id"], name: "index_friendships_on_user_id_and_friend_id", unique: true
     t.index ["user_id"], name: "index_friendships_on_user_id"
@@ -224,6 +226,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_29_194748) do
   add_foreign_key "event_pictures", "users"
   add_foreign_key "events", "bars"
   add_foreign_key "friendships", "bars"
+  add_foreign_key "friendships", "events"
   add_foreign_key "friendships", "users"
   add_foreign_key "friendships", "users", column: "friend_id"
   add_foreign_key "reviews", "beers", on_delete: :cascade
