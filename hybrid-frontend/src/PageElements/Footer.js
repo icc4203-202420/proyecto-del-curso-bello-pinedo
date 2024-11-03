@@ -21,10 +21,10 @@ function Footer() {
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Home')}>
             <Icon name="home" size={24} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Bar')}>
+          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BarsScreen')}>
             <Icon name="shopping-basket" size={24} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Calendar')}>
+          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('EventsSearch')}>
             <Icon name="calendar" size={24} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BeersSearch')}>
