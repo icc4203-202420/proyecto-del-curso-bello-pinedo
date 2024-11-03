@@ -6,6 +6,8 @@ import BeersSearch from "../../Beers/screens/BeerSearch";  // Pantalla de búsqu
 import BeerDetails from "../../Beers/screens/BeersDetails";  // Pantalla de detalles de una cerveza
 import SignIn from "../../User/screens/SignIn";
 import SignUp from "../../User/screens/SignUp";
+import EventsSearch from "../../Events/screens/EventsSearch";
+import EventDetails from "../../Events/screens/EventsDetails";
 
 const CoreStack = createNativeStackNavigator();
 
@@ -96,6 +98,42 @@ const HomeNavigation = () => {
           headerTitleAlign: 'center',
          }}
       />
+      {/* Pantalla de Búsqueda de Eventos */}
+      <CoreStack.Screen
+        name="EventsSearch"
+        component={EventsSearch}
+        options={{ 
+          title: 'Events',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
+          },
+          headerTintColor: '#f5c000',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+         }} 
+         />
+
+        {/* Pantalla de Detalles de un Evento */}
+         <CoreStack.Screen
+         name="EventDetails"
+         component={EventDetails}
+         options={{
+          title: 'Event Details',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de
+          },
+          headerTintColor: '#f5c000',  // Cambia el color de la flecha y el texto
+          headerTitleStyle: {
+            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+          },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+
     </CoreStack.Navigator>
   );
 };
