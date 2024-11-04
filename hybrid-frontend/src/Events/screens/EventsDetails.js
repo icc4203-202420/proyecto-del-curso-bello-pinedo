@@ -3,7 +3,7 @@ import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native'
 import { useRoute, useNavigation } from '@react-navigation/native';
 import axiosInstance from '../../PageElements/axiosInstance';
 import Footer from '../../PageElements/Footer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 function EventsDetails() {
   const [event, setEvent] = useState(null);
@@ -19,7 +19,7 @@ function EventsDetails() {
 
     const fetchUserData = async () => {
       try {
-        const storedUser = await AsyncStorage.getItem('user');
+        const storedUser = await SecureStore.getItemAsync('user');
         if (storedUser) {
           setCurrentUser(JSON.parse(storedUser));
         }
@@ -43,7 +43,7 @@ function EventsDetails() {
 
   const handleCheckIn = () => {
     setLoading(true);
-    axiosInstance.post(`/events/${eventId}/checkin`, { user_id: currentUser.id })
+    axiosInstance.post(`/attendances`, { user_id: currentUser.id, event_id: eventId, checked_in: true })
       .then(() => {
         setCheckInSuccess('You have successfully checked in to the event!');
         notifyFriends();

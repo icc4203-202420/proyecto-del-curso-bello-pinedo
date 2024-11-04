@@ -4,7 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import axiosInstance from '../../PageElements/axiosInstance';
 import Footer from '../../PageElements/Footer';
 import { Picker } from '@react-native-picker/picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 function FriendDetails() {
   const [user, setUser] = useState(null);
@@ -12,7 +12,6 @@ function FriendDetails() {
   const [events, setEvents] = useState();
   const [selectedEvent, setSelectedEvent] = useState();
   const [loading, setLoading] = useState(false);
-  const [checkInSuccess, setCheckInSuccess] = useState('');
   const [error, setError] = useState('');
   const { id } = useRoute().params;
   const navigation = useNavigation();
@@ -23,12 +22,15 @@ function FriendDetails() {
 
     const fetchUserData = async () => {
       try {
-        const storedUser = await AsyncStorage.getItem('user');
+        const storedUser = await SecureStore.getItemAsync('user');
         if (storedUser) {
           setCurrentUser(JSON.parse(storedUser));
         }
       } catch (error) {
         console.error('Error retrieving user data:', error);
+      }
+      finally {
+        setLoading(false);
       }
     };
 
@@ -56,19 +58,15 @@ function FriendDetails() {
   };
 
   const handleAdd = () => {
-    setLoading(true);
-    axiosInstance.post(`/friendships`, { user_id: currentUser.id ,friend_id: id, event_id: selectedEvent })
+    axiosInstance.post(`/friendships`, { user_id: currentUser.id, friend_id: id, event_id: selectedEvent })
       .then(() => {
-        setCheckInSuccess('You have successfully checked in to the event!');
-        notifyFriends();
+        setError('');
       })
       .catch(() => {
         setError('Error adding friend. Please try again.');
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
+  
 
   if (!user) {
     return (
@@ -77,6 +75,10 @@ function FriendDetails() {
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
+  }
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#f5c000" />;
   }
 
   return (
@@ -95,9 +97,13 @@ function FriendDetails() {
                 onValueChange={(itemValue) => setSelectedEvent(itemValue)}
             >
                 <Picker.Item label="Select an event" value="" />
-                {events.map((event) => (
-                <Picker.Item key={event.id} label={event.name} value={event.id} />
-                ))}
+                {events ? (
+                  events.map((event) => (
+                    <Picker.Item key={event.id} label={event.name} value={event.id} />
+                  ))
+                ) : (
+                  <Picker.Item label="No events available" value="" />
+                )}
             </Picker>
 
         </View>

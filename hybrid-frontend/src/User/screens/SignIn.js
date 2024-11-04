@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import axiosInstance from '../../PageElements/axiosInstance';
-import AsyncStorage from '@react-native-async-storage/async-storage';  // Import AsyncStorage
+import * as SecureStore from 'expo-secure-store';
 
 function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
@@ -16,51 +16,54 @@ function SignIn({ navigation }) {
 
   const handleSignIn = async () => {
     const newErrors = {};
-
-    if (__DEV__) {
-      navigation.navigate('Home');
-      return;
-    }
-
+  
     if (!validateEmail(email)) {
       newErrors.email = 'Please enter a valid email address.';
     }
-
+  
     if (!email.trim()) {
       newErrors.email = 'Email is required.';
     }
-
+  
     if (!password.trim()) {
       newErrors.password = 'Password is required.';
     }
-
+  
     if (password.length < 6) {
       newErrors.password = 'Invalid Password.';
     }
-
+  
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+  
     setLoading(true);
     const user = { "user": { email: email, password: password } };
-
+  
     try {
       const response = await axiosInstance.post('/login', user);
       setLoading(false);
       const userData = response.data.status.data.user;
-
-      // Save user data to AsyncStorage
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
-
+  
+      // Check if userData contains the expected properties, especially id
+      if (!userData || !userData.id) {
+        throw new Error('Invalid user data');
+      }
+  
+      // Save user data to SecureStore
+      await SecureStore.setItemAsync('user', JSON.stringify(userData));
+      console.log('User data saved:', userData);  // Debugging log
+  
       Alert.alert('Success', 'Logged in successfully!');
       navigation.navigate('Home');  // Navigate to home screen
     } catch (error) {
       setLoading(false);
+      console.error('Error during sign-in or data saving:', error);  // Debugging log
       Alert.alert('Error', 'Invalid email or password');
     }
   };
+  
 
   return (
     <View style={styles.container}>

@@ -4,7 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { Rating } from 'react-native-ratings'; 
 import axiosInstance from '../../PageElements/axiosInstance';
 import Footer from '../../PageElements/Footer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 function reviewsReducer(state, action) {
   switch (action.type) {
@@ -43,7 +43,7 @@ function BeerDetails() {
 
     const fetchUserData = async () => {
       try {
-        const storedUser = await AsyncStorage.getItem('user');
+        const storedUser = await SecureStore.getItemAsync('user');
         if (storedUser) {
           setCurrentUser(JSON.parse(storedUser));
         }
