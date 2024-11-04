@@ -1,7 +1,7 @@
 class API::V1::EventsController < ApplicationController
   respond_to :json
-  before_action :set_event, only: [:show, :update, :destroy]
-  before_action :set_bar, only: [:index,:show, :create]
+  before_action :set_event, only: [:show, :update, :destroy, :generate_summary]
+  before_action :set_bar, only: [:index, :show, :create]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   def index
@@ -13,8 +13,8 @@ class API::V1::EventsController < ApplicationController
     if @event.flyer.attached?
       render json: @event.as_json.merge({ 
         image_url: url_for(@event.flyer), 
-        thumbnail_url: url_for(@event.thumbnail) }),
-        status: :ok
+        thumbnail_url: url_for(@event.thumbnail) 
+      }), status: :ok
     else
       render json: { event: @event.as_json }, status: :ok
     end
@@ -46,10 +46,25 @@ class API::V1::EventsController < ApplicationController
     head :no_content
   end
 
+  def generate_summary
+    video_generator = VideoGeneratorService.new(@event)
+    video_path = video_generator.generate_video
+
+    if video_path
+      video_url = "/events/#{@event.id}/summary_video.mp4"
+      render json: { video_url: video_url }, status: :created
+    else
+      render json: { error: 'Error generating video summary' }, status: :internal_server_error
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Event not found' }, status: :not_found
+  end 
+
   private
 
   def set_event
-    @event = Event.find(params[:id])
+    @event = Event.find_by(id: params[:id])
+    render json: { error: 'Event not found' }, status: :not_found unless @event
   end
 
   def set_bar
@@ -69,5 +84,5 @@ class API::V1::EventsController < ApplicationController
   def verify_jwt_token
     authenticate_user!
     head :unauthorized unless current_user
-  end  
+  end
 end

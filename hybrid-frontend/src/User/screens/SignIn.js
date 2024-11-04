@@ -17,6 +17,11 @@ function SignIn({ navigation }) {
   const handleSignIn = async () => {
     const newErrors = {};
 
+    if (__DEV__) {
+      navigation.navigate('Home');
+      return;
+    }
+
     if (!validateEmail(email)) {
       newErrors.email = 'Please enter a valid email address.';
     }

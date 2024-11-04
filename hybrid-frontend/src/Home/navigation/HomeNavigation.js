@@ -7,7 +7,10 @@ import BeerDetails from "../../Beers/screens/BeersDetails";  // Pantalla de deta
 import SignIn from "../../User/screens/SignIn";
 import SignUp from "../../User/screens/SignUp";
 import EventsSearch from "../../Events/screens/EventsSearch";
-import EventDetails from "../../Events/screens/EventsDetails";
+import EventsDetails from "../../Events/screens/EventsDetails";
+import EventsGallery from "../../Events/screens/EventsGallery";
+import EventsPictureDetails from "../../Events/screens/EventsPictureDetails";
+import EventsPictureUpload from "../../Events/screens/EventsPictureUpload";
 import FriendSearch from "../../Friends/screens/FriendSearch";
 import FriendDetails from "../../Friends/screens/FriendDetails";
 
@@ -23,13 +26,13 @@ const HomeNavigation = () => {
         options={{ 
           title: 'Sign In',
           headerStyle: {
-            backgroundColor: '#1E1E1E',  // Cambia el color del fondo de la barra
+            backgroundColor: '#1E1E1E',  
           },
-          headerTintColor: '#FFF',  // Cambia el color de la flecha y el texto
+          headerTintColor: '#FFF',  
           headerTitleStyle: {
-            fontWeight: 'bold',  // Ajusta el estilo del texto del título
+            fontWeight: 'bold',  
           },
-          headerShown: false,  // Oculta la barra de navegación
+          headerShown: false,  
          }}
       />
       {/* Pantalla de Registro */}
@@ -120,8 +123,8 @@ const HomeNavigation = () => {
 
         {/* Pantalla de Detalles de un Evento */}
          <CoreStack.Screen
-         name="EventDetails"
-         component={EventDetails}
+         name="EventsDetails"
+         component={EventsDetails}
          options={{
           title: 'Event Details',
           headerStyle: {
@@ -135,7 +138,50 @@ const HomeNavigation = () => {
           headerTitleAlign: 'center',
         }}
       />
-
+      {/* Pantalla de Galería de un Evento */}
+      <CoreStack.Screen
+        name="EventsGallery"
+        component={EventsGallery}  // Add EventsGallery here
+        options={{
+          title: 'Event Gallery',
+          headerStyle: {
+            backgroundColor: '#1E1E1E',
+          },
+          headerTintColor: '#f5c000',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      {/* Pantalla de Detalles de una Imagen de un Evento */}
+      <CoreStack.Screen
+        name="EventsPictureDetails"
+        component={EventsPictureDetails}
+        options={{
+          title: "Picture Details",
+          headerStyle: { backgroundColor: "#1E1E1E" },
+          headerTintColor: "#f5c000",
+          headerTitleStyle: { fontWeight: "bold" },
+          headerShadowVisible: false,
+          headerTitleAlign: "center",
+        }}
+      />
+      {/* Pantalla de Detalles de una Imagen de un Evento */}
+      <CoreStack.Screen
+        name="EventsPictureUpload"
+        component={EventsPictureUpload}
+        options={{
+          title: "Picture Details",
+          headerStyle: { backgroundColor: "#1E1E1E" },
+          headerTintColor: "#f5c000",
+          headerTitleStyle: { fontWeight: "bold" },
+          headerShadowVisible: false,
+          headerTitleAlign: "center",
+        }}
+      />
+      {/* Pantalla de Busqueda de Usuarios */}
         <CoreStack.Screen
          name="FriendSearch"
          component={FriendSearch}
@@ -152,7 +198,7 @@ const HomeNavigation = () => {
           headerTitleAlign: 'center',
         }}
       />
-
+      {/* Pantalla de Detalles de un Usuario */}
         <CoreStack.Screen
          name="FriendDetails"
          component={FriendDetails}

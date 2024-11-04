@@ -19,19 +19,16 @@ function EventsSearch() {
   const fetchAllEvents = async () => {
     setLoading(true);
     try {
-      // Primero, obtenemos todos los bares
       const barsResponse = await axiosInstance.get('/bars');
       const bars = barsResponse.data.bars;
 
-      // Ahora, recorremos cada bar para obtener sus eventos
       const allEvents = await Promise.all(
         bars.map(async (bar) => {
           const eventsResponse = await axiosInstance.get(`/bars/${bar.id}/events`);
-          return eventsResponse.data; // Aquí asumimos que la respuesta es un array de eventos
+          return eventsResponse.data; 
         })
       );
 
-      // Aplanamos el array de eventos y lo almacenamos
       const flattenedEvents = allEvents.flat();
       setEvents(flattenedEvents);
       setFilteredEvents(flattenedEvents);
@@ -58,7 +55,7 @@ function EventsSearch() {
   const renderEventItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('EventDetails', { id: item.id })}
+      onPress={() => navigation.navigate('EventsDetails', { id: item.id })}
     >
       <Text style={styles.eventName}>{item.name}</Text>
       <Text style={styles.eventDate}>Date: {new Date(item.date).toLocaleString()}</Text>

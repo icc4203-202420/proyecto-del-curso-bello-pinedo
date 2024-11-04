@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :bars do
         resources :events do
+          post 'generate_summary', on: :member
           resources :images, only: [:create, :index, :show], controller: 'event_pictures' do
             post 'tag_user', on: :member  # Ruta personalizada para etiquetar usuarios en una imagen específica
           end

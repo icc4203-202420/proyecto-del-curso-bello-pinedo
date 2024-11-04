@@ -11,7 +11,7 @@ function EventsDetails() {
   const [loading, setLoading] = useState(false);
   const [checkInSuccess, setCheckInSuccess] = useState('');
   const [error, setError] = useState('');
-  const { id } = useRoute().params;
+  const { id: eventId, barId } = useRoute().params; // Include barId for gallery
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -29,10 +29,10 @@ function EventsDetails() {
     };
 
     fetchUserData();
-  }, [id]);
+  }, [eventId]);
 
   const fetchEventDetails = () => {
-    axiosInstance.get(`/events/${id}`)
+    axiosInstance.get(`/events/${eventId}`)
       .then((res) => {
         setEvent(res.data);
       })
@@ -43,7 +43,7 @@ function EventsDetails() {
 
   const handleCheckIn = () => {
     setLoading(true);
-    axiosInstance.post(`/events/${id}/checkin`, { user_id: currentUser.id })
+    axiosInstance.post(`/events/${eventId}/checkin`, { user_id: currentUser.id })
       .then(() => {
         setCheckInSuccess('You have successfully checked in to the event!');
         notifyFriends();
@@ -58,12 +58,16 @@ function EventsDetails() {
 
   const notifyFriends = () => {
     axiosInstance.post(`/users/${currentUser.id}/notify-friends`, {
-      event_id: id,
+      event_id: eventId,
       message: `${currentUser.name} has checked in to the event: ${event.name}`
     })
     .catch(() => {
       console.error('Error notifying friends about check-in.');
     });
+  };
+
+  const handleViewGallery = () => {
+    navigation.navigate('EventsGallery', { barId, eventId });
   };
 
   if (!event) {
@@ -95,6 +99,15 @@ function EventsDetails() {
           onPress={handleCheckIn}
           disabled={loading}
         />
+
+        {/* View Gallery Button */}
+        <View style={styles.buttonContainer}>
+          <Button
+            title="View Gallery"
+            color="#f5c000"
+            onPress={handleViewGallery}
+          />
+        </View>
       </View>
       <Footer />
     </>
@@ -110,6 +123,7 @@ const styles = StyleSheet.create({
   error: { color: 'red', marginBottom: 10, textAlign: 'center' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E1E1E' },
   loadingText: { marginTop: 10, color: '#f5c000' },
+  buttonContainer: { marginTop: 20 }
 });
 
 export default EventsDetails;
