@@ -1,49 +1,41 @@
 # app/services/video_generator_service.rb
-require 'open3'
 require 'fileutils'
-require 'open-uri'
 
 class VideoGeneratorService
   def initialize(event)
     @event = event
-    @images_path = Rails.root.join("tmp", "events", event.id.to_s, "images")
-    @output_path = Rails.root.join("public", "events", event.id.to_s, "summary_video.mp4")
-    FileUtils.mkdir_p(@images_path) # Crea el directorio temporal si no existe
+    @output_path = Rails.root.join("public", "events", @event.id.to_s, "summary_video.mp4")
+    @image_paths = event.event_pictures.map { |pic| local_file_path(pic.picture) }
   end
 
   def generate_video
-    download_images # Descargar imágenes a la carpeta temporal
-
-    # Comando ffmpeg para crear un video a partir de las imágenes
-    command = "ffmpeg -framerate 1/3 -pattern_type glob -i '#{@images_path}/*.jpg' -c:v libx264 #{@output_path}"
-
-    # Ejecuta el comando ffmpeg y captura errores
-    stdout, stderr, status = Open3.capture3(command)
-
-    if status.success?
-      @output_path.to_s
-    else
-      Rails.logger.error("FFmpeg error: #{stderr}")
-      nil
+    output_dir = File.dirname(@output_path)
+    FileUtils.mkdir_p(output_dir) unless Dir.exist?(output_dir)
+  
+    # Create input.txt file with duration for each image
+    input_file = Rails.root.join("tmp", "input.txt")
+    File.open(input_file, "w") do |file|
+      @image_paths.each do |image_path|
+        file.puts "file '#{image_path}'"
+        file.puts "duration 3"
+      end
+      file.puts "file '#{@image_paths.last}'" if @image_paths.any?
     end
+  
+    # FFmpeg command with resolution scaling to nearest even dimensions
+    command = "ffmpeg -f concat -safe 0 -i '#{input_file}' -vf 'scale=ceil(iw/2)*2:ceil(ih/2)*2' -c:v libx264 -pix_fmt yuv420p #{@output_path}"
+    system(command)
   ensure
-    FileUtils.rm_rf(@images_path) # Elimina el directorio temporal después de usarlo
+    FileUtils.rm(input_file) if File.exist?(input_file)
   end
 
   private
 
-  def download_images
-    @event.event_pictures.each_with_index do |picture, index|
-      image_url = Rails.application.routes.url_helpers.rails_blob_url(picture.picture, only_path: true)
-      download_path = File.join(@images_path, "image_#{index}.jpg")
-      URI.open(image_url) do |image|
-        File.open(download_path, "wb") do |file|
-          file.write(image.read)
-        end
-      end
-    rescue => e
-      Rails.logger.error("Error downloading images: #{e.message}")
-      raise "Error downloading images"
-    end
+  # Método para obtener la ruta física del archivo almacenado localmente en Active Storage
+  def local_file_path(attachment)
+    ActiveStorage::Blob.service.path_for(attachment.key)
+  rescue => e
+    Rails.logger.error("Error retrieving file path for attachment #{attachment.id}: #{e.message}")
+    nil
   end
 end

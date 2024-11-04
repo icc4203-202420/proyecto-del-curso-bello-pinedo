@@ -146,7 +146,7 @@ function EventsDetails() {
         /> : 
         <Button
           title={loading ? 'Checking in...' : 'Check In'}
-          color="#1E1E1E"
+          color="#f5c000"
           onPress={handleCheckIn}
           disabled={loading}
         />
