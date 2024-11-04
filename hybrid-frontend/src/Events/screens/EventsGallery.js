@@ -4,12 +4,12 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { Video } from 'expo-av';
 import axiosInstance from '../../PageElements/axiosInstance';
 
-
 function EventsGallery() {
   const { barId, eventId } = useRoute().params; 
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [noImagesAvailable, setNoImagesAvailable] = useState(false);
   const navigation = useNavigation();
 
   const getBaseURL = () => {
@@ -29,7 +29,12 @@ function EventsGallery() {
   
       // Dynamically get the base URL for the video file
       const videoUrl = `${getBaseURL()}/events/${eventId}/summary_video.mp4`;
-      galleryData.push({ type: 'video', url: videoUrl });
+      if (galleryData.length > 0 || res.data.video_url) {
+        galleryData.push({ type: 'video', url: videoUrl });
+        setNoImagesAvailable(false);
+      } else {
+        setNoImagesAvailable(true); // Set this if there are no images
+      }
   
       console.log("Gallery data with video:", galleryData);
       setGallery(galleryData);
@@ -40,7 +45,6 @@ function EventsGallery() {
       setLoading(false);
     }
   };
-  
 
   const handleGenerateSummary = async () => {
     setLoading(true);
@@ -70,6 +74,10 @@ function EventsGallery() {
       )}
 
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {!loading && noImagesAvailable && (
+        <Text style={styles.noImagesText}>No images available for this event.</Text>
+      )}
 
       {!loading && !error && gallery.length === 0 && (
         <Text style={styles.noImagesText}>No images or videos found for this event.</Text>
