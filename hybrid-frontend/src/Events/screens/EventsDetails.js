@@ -10,7 +10,9 @@ function EventsDetails() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [checkInSuccess, setCheckInSuccess] = useState('');
+  const [attendance, setAttendance] = useState(null);
   const [error, setError] = useState('');
+  const [refresh, setRefresh] = useState(false);
   const { id: eventId, barId } = useRoute().params; // Include barId for gallery
   const navigation = useNavigation();
 
@@ -29,20 +31,40 @@ function EventsDetails() {
     };
 
     fetchUserData();
-  }, [eventId]);
+  }, [eventId, refresh]);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchAttendance();
+    }
+  }, [currentUser]);
 
   const fetchEventDetails = () => {
     axiosInstance.get(`/events/${eventId}`)
       .then((res) => {
-        setEvent(res.data);
+        setEvent(res.data.event);
       })
       .catch(() => {
         setError('Error fetching event details.');
       });
   };
 
-  const handleCheckIn = () => {
+  const fetchAttendance = () => {
     setLoading(true);
+    axiosInstance.get(`/attendances`)
+      .then((res) => {
+        const AttendanceFiltered = res.data.find((a) => a.user_id === currentUser.id && a.event_id === eventId);
+        setAttendance(AttendanceFiltered);
+      })
+      .catch(() => {
+        setError('Error fetching attendance details.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleCheckIn = () => {
     axiosInstance.post(`/attendances`, { user_id: currentUser.id, event_id: eventId, checked_in: true })
       .then(() => {
         setCheckInSuccess('You have successfully checked in to the event!');
@@ -52,9 +74,22 @@ function EventsDetails() {
         setError('Error checking in to the event. Please try again.');
       })
       .finally(() => {
-        setLoading(false);
+        setRefresh(refresh => !refresh);
       });
   };
+
+  const handleCheckOut = () => {
+    axiosInstance.delete(`/attendances/${attendance.id}`)
+      .then(() => {
+        setCheckInSuccess('You have successfully checked out of the event.');
+      })
+      .catch(() => {
+        setError('Error checking out of the event. Please try again.');
+      })
+      .finally(() => {
+        setRefresh(refresh => !refresh);
+      });
+  }
 
   const notifyFriends = () => {
     axiosInstance.post(`/users/${currentUser.id}/notify-friends`, {
@@ -79,6 +114,15 @@ function EventsDetails() {
     );
   }
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f5c000" />
+        <Text style={styles.loadingText}>Checking in...</Text>
+      </View>
+    );
+  }
+
   return (
     <>
       <View style={styles.container}>
@@ -93,12 +137,22 @@ function EventsDetails() {
         {checkInSuccess ? <Text style={styles.success}>{checkInSuccess}</Text> : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
+        {attendance ? 
+        <Button
+          title={loading ? 'Checking in...' : 'Check Out'}
+          color="#1E1E1E"
+          onPress={handleCheckOut}
+          disabled={loading}
+        /> : 
         <Button
           title={loading ? 'Checking in...' : 'Check In'}
           color="#1E1E1E"
           onPress={handleCheckIn}
           disabled={loading}
         />
+      }
+
+        
 
         {/* View Gallery Button */}
         <View style={styles.buttonContainer}>
@@ -117,7 +171,7 @@ function EventsDetails() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#1E1E1E' },
   card: { backgroundColor: '#f5c000', padding: 20, borderRadius: 10, marginBottom: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10},
   details: { fontSize: 14, marginBottom: 5 },
   success: { color: 'green', marginBottom: 10, textAlign: 'center' },
   error: { color: 'red', marginBottom: 10, textAlign: 'center' },

@@ -13,6 +13,8 @@ function FriendDetails() {
   const [selectedEvent, setSelectedEvent] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [friendship, setFriendship] = useState(null);
+  const [refresh, setRefresh] = useState(false);
   const { id } = useRoute().params;
   const navigation = useNavigation();
 
@@ -35,7 +37,29 @@ function FriendDetails() {
     };
 
     fetchUserData();
-  }, [id]);
+  }, [id, refresh]);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchFriendship();
+    }
+  }, [currentUser]);
+
+  const fetchFriendship = () => {
+    setLoading(true);
+    axiosInstance.get(`/friendships`, { params: { user_id: currentUser.id } })
+      .then((res) => {
+        const friendshipWithFriendId = res.data.friendships.find((f) => f.friend_id === id);
+        setFriendship(friendshipWithFriendId);
+      })
+      .catch(() => {
+        setError('Error fetching friendship details.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  
 
   const fetchUserDetails = () => {
     axiosInstance.get(`/users/${id}`)
@@ -64,10 +88,25 @@ function FriendDetails() {
       })
       .catch(() => {
         setError('Error adding friend. Please try again.');
+      })
+      .finally(() => {
+        setRefresh(refresh => !refresh);
       });
   };
-  
 
+  const handleRemove = () => {
+    axiosInstance.delete(`/friendships/${friendship.id}`)
+      .then(() => {
+        setError('');
+      })
+      .catch(() => {
+        setError('Error removing friend. Please try again.');
+      })
+      .finally(() => {
+        setRefresh(refresh => !refresh);
+      });
+  }
+  
   if (!user) {
     return (
       <View style={styles.loadingContainer}>
@@ -78,44 +117,59 @@ function FriendDetails() {
   }
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#f5c000" />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f5c000" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
   }
 
   return (
     <>
       <View style={styles.container}>
         <View style={styles.card}>
-            <Text style={styles.title}>{user.handle}</Text>
-            <Text style={styles.details}>Name: {user.first_name} {user.last_name}</Text>
-            <Text style={styles.details}>Email: {user.email}</Text>
+          <Text style={styles.title}>{user.handle}</Text>
+          <Text style={styles.details}>Name: {user.first_name} {user.last_name}</Text>
+          <Text style={styles.details}>Email: {user.email}</Text>
         </View>
 
-        <View style={styles.card}>
+        {friendship ? (
+          <Button
+            title={loading ? 'Loading...' : 'Remove Friend'}
+            color="#f5c000"
+            onPress={handleRemove}
+          />
+        ) : (
+          <>
+          <View style={styles.card}>
             <Text style={styles.details}>Where did you meet?</Text>
             <Picker
-                selectedValue={selectedEvent}
-                onValueChange={(itemValue) => setSelectedEvent(itemValue)}
+              selectedValue={selectedEvent}
+              onValueChange={(itemValue) => setSelectedEvent(itemValue)}
             >
-                <Picker.Item label="Select an event" value="" />
-                {events ? (
-                  events.map((event) => (
-                    <Picker.Item key={event.id} label={event.name} value={event.id} />
-                  ))
-                ) : (
-                  <Picker.Item label="No events available" value="" />
-                )}
+              <Picker.Item label="Select an event" value="" />
+              {events ? (
+                events.map((event) => (
+                  <Picker.Item key={event.id} label={event.name} value={event.id} />
+                ))
+              ) : (
+                <Picker.Item label="No events available" value="" />
+              )}
             </Picker>
+          </View>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        </View>
+          <Button
+            title={loading ? 'Checking in...' : 'Add Friend'}
+            color="#f5c000"
+            onPress={handleAdd}
+            disabled={loading}
+          />
+          </>
+        )}
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        <Button
-          title={loading ? 'Checking in...' : 'Add Friend'}
-          color="#f5c000"
-          onPress={handleAdd}
-          disabled={loading}
-        />
+        
       </View>
       <Footer />
     </>
