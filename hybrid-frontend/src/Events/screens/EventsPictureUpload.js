@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, ActivityIndicator, StyleSheet, Image, Alert } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { View, Text, TextInput, Button, ActivityIndicator, StyleSheet, Image, Alert, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axiosInstance from '../../PageElements/axiosInstance';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
 
 function EventPictureUpload() {
   const [imageUri, setImageUri] = useState(null);
+  const [event, setEvent] = useState(null);
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,11 +17,22 @@ function EventPictureUpload() {
 
   const navigation = useNavigation();
   const route = useRoute();
-  const { id: eventId, barId } = route.params;
+  const { eventId } = route.params;
 
   useEffect(() => {
     fetchUsers();
+    fetchEventDetails();
+    requestPermissions();  // Request permissions for iOS
   }, []);
+
+  const requestPermissions = async () => {
+    if (Platform.OS === 'ios') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'We need permission to access your photos to upload images.');
+      }
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -31,30 +43,38 @@ function EventPictureUpload() {
     }
   };
 
-  const pickImage = () => {
-    if (typeof launchImageLibrary !== 'function') {
-      Alert.alert('Error', 'Image picker is not available. Please try again.');
+  const fetchEventDetails = async () => {
+    try {
+      const response = await axiosInstance.get(`/events/${eventId}`);
+      setEvent(response.data.event);
+    } catch (err) {
+      console.error('Error fetching event details:', err);
+    }
+  };
+
+  const pickImage = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.status !== 'granted') {
+      Alert.alert('Permission to access camera roll is required!');
       return;
     }
-
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        includeBase64: false,
-      },
-      (response) => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-        } else if (response.errorMessage) {
-          console.error('ImagePicker Error: ', response.errorMessage);
-          Alert.alert('Error', 'Could not pick the image. Please try again.');
-        } else {
-          // Successful selection
-          setImageUri(response.assets[0].uri);
-        }
-      }
-    );
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    } else {
+      console.log('User cancelled image picker');
+    }
   };
+  
+  
 
   const handleUpload = async () => {
     if (!imageUri) {
@@ -76,7 +96,7 @@ function EventPictureUpload() {
     if (selectedUser) formData.append('tag_user_id', selectedUser);
 
     try {
-      const response = await axiosInstance.post(`/bars/${barId}/events/${eventId}/images`, formData, {
+      const response = await axiosInstance.post(`/bars/${event.bar_id}/events/${eventId}/images`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

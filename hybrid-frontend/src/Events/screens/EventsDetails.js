@@ -140,7 +140,7 @@ function EventsDetails() {
         {attendance ? 
         <Button
           title={loading ? 'Checking in...' : 'Check Out'}
-          color="#1E1E1E"
+          color="#f5c000"
           onPress={handleCheckOut}
           disabled={loading}
         /> : 

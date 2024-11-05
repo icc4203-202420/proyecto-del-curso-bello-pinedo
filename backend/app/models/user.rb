@@ -29,6 +29,8 @@ class User < ApplicationRecord
   # Amistades donde el usuario es el amigo añadido
   has_many :inverse_friendships, class_name: 'Friendship', foreign_key: 'friend_id'
   has_many :inverse_friends, through: :inverse_friendships, source: :user  
+  has_many :notifications, foreign_key: :user_id
+  has_many :sent_notifications, class_name: 'Notification', foreign_key: :sender_id
 
   def generate_jwt
     Warden::JWTAuth::UserEncoder.new.call(self, :user, nil)[0]
