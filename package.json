@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@react-google-maps/api": "^2.19.3",
+    "react-native-dotenv": "^3.4.11",
+    "react-native-image-picker": "^7.1.2"
+  },
+  "devDependencies": {
+    "@react-native-community/cli": "^15.0.1"
+  }
+}
