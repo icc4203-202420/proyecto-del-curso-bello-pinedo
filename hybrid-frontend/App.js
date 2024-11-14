@@ -1,3 +1,4 @@
+// App.js
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image, SafeAreaView, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -31,8 +32,8 @@ function App() {
   }, []);
 
   return (
-    <FeedProvider>
-      <NavigationContainer>
+    <NavigationContainer>
+      <FeedProvider>
         <View style={styles.container}>
           {/* Header */}
           <SafeAreaView style={styles.safeArea}>
@@ -51,8 +52,8 @@ function App() {
             <Stack.Screen name="SignUp" component={SignUp} options={{ title: 'Sign Up' }} />
           </Stack.Navigator>
         </View>
-      </NavigationContainer>
-    </FeedProvider>
+      </FeedProvider>
+    </NavigationContainer>
   );
 }
 
