@@ -56,7 +56,7 @@ function SignIn({ navigation }) {
       console.log('User data saved:', userData);  // Debugging log
   
       Alert.alert('Success', 'Logged in successfully!');
-      navigation.navigate('Home');  // Navigate to home screen
+      navigation.navigate('Feed');  // Navigate to home screen
     } catch (error) {
       setLoading(false);
       console.error('Error during sign-in or data saving:', error);  // Debugging log

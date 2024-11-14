@@ -13,6 +13,7 @@ import EventsPictureDetails from "../../Events/screens/EventsPictureDetails";
 import EventsPictureUpload from "../../Events/screens/EventsPictureUpload";
 import FriendSearch from "../../Friends/screens/FriendSearch";
 import FriendDetails from "../../Friends/screens/FriendDetails";
+import FeedScreen from "../../Feed/screens/FeedScreen";
 
 const CoreStack = createNativeStackNavigator();
 
@@ -213,6 +214,19 @@ const HomeNavigation = () => {
           },
           headerShadowVisible: false,
           headerTitleAlign: 'center',
+        }}
+      />
+      <CoreStack.Screen
+        name="Feed"
+        component={FeedScreen}
+        options={{
+          title: 'Feed',
+          headerStyle: { backgroundColor: '#1E1E1E' },
+          headerTintColor: '#f5c000',
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerShadowVisible: true,
+          headerTitleAlign: 'center',
+          headerShown: true,  // Asegúrate de que esté configurado en "true"
         }}
       />
 

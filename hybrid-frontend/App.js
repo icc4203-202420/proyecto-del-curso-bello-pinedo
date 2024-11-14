@@ -9,6 +9,7 @@ import BeersSearch from "./src/Beers/screens/BeerSearch";
 import BeerDetails from "./src/Beers/screens/BeersDetails";
 import SignIn from "./src/User/screens/SignIn";
 import SignUp from "./src/User/screens/SignUp";
+import { FeedProvider } from "./src/contexts/FeedContext";  
 
 const Stack = createNativeStackNavigator();
 
@@ -16,12 +17,10 @@ function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
 
   useEffect(() => {
-    // Register for notifications and get permission
     registerForPushNotificationsAsync().then(token => {
       setExpoPushToken(token);
     });
 
-    // Set up listener for incoming notifications
     const notificationListener = Notifications.addNotificationReceivedListener(notification => {
       Alert.alert('Notification Received', notification.request.content.body);
     });
@@ -32,30 +31,31 @@ function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <View style={styles.container}>
-        {/* Header */}
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.header}>
-            <Image source={require('./assets/beer-icon.png')} style={styles.logo} />
-            <Text style={styles.headerTitle}>BeerMark</Text>
-          </View>
-        </SafeAreaView>
+    <FeedProvider>
+      <NavigationContainer>
+        <View style={styles.container}>
+          {/* Header */}
+          <SafeAreaView style={styles.safeArea}>
+            <View style={styles.header}>
+              <Image source={require('./assets/beer-icon.png')} style={styles.logo} />
+              <Text style={styles.headerTitle}>BeerMark</Text>
+            </View>
+          </SafeAreaView>
 
-        {/* Stack Navigator */}
-        <Stack.Navigator initialRouteName="Sign In">
-          <Stack.Screen name="Home" component={HomeNavigation} options={{ headerShown: false }} />
-          <Stack.Screen name="BeersSearch" component={BeersSearch} options={{ title: 'Search Beers' }} />
-          <Stack.Screen name="BeerDetails" component={BeerDetails} options={{ title: 'Beer Details' }} />
-          <Stack.Screen name="SignIn" component={SignIn} options={{ title: 'Sign In' }} />
-          <Stack.Screen name="SignUp" component={SignUp} options={{ title: 'Sign Up' }} />
-        </Stack.Navigator>
-      </View>
-    </NavigationContainer>
+          {/* Stack Navigator */}
+          <Stack.Navigator initialRouteName="Sign In">
+            <Stack.Screen name="Home" component={HomeNavigation} options={{ headerShown: false }} />
+            <Stack.Screen name="BeersSearch" component={BeersSearch} options={{ title: 'Search Beers' }} />
+            <Stack.Screen name="BeerDetails" component={BeerDetails} options={{ title: 'Beer Details' }} />
+            <Stack.Screen name="SignIn" component={SignIn} options={{ title: 'Sign In' }} />
+            <Stack.Screen name="SignUp" component={SignUp} options={{ title: 'Sign Up' }} />
+          </Stack.Navigator>
+        </View>
+      </NavigationContainer>
+    </FeedProvider>
   );
 }
 
-// Function to request notification permissions and get the Expo push token
 async function registerForPushNotificationsAsync() {
   const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
   let finalStatus = existingStatus;
