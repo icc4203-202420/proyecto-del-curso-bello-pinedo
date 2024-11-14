@@ -34,8 +34,3 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-#axiosInstance
-axiosInstance.js
-axiosInstance.json
-package-lock.json
-package.json
