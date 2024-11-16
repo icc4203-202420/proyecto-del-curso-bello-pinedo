@@ -1,13 +1,21 @@
-// src/contexts/FeedContext.js
 import React, { createContext, useEffect, useState } from 'react';
 import axiosInstance from '../PageElements/axiosInstance';
 import * as SecureStore from 'expo-secure-store';
+import useWebSocket from 'react-use-websocket';
+import config from '../config/config'; // Importa configuración
 
 export const FeedContext = createContext();
 
 export const FeedProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
+
+  // Configura el WebSocket
+  const { lastMessage, sendMessage } = useWebSocket(config.WS_BASE_URL, { // Usa la URL del archivo config.js
+    onOpen: () => console.log('Connected to WebSocket'),
+    onClose: () => console.log('Disconnected from WebSocket'),
+    shouldReconnect: () => true,
+  });
 
   useEffect(() => {
     const loadFeedData = async () => {
@@ -24,22 +32,22 @@ export const FeedProvider = ({ children }) => {
         // Obtener amistades del usuario actual
         console.log(`Fetching friendships for user ${user.id}...`);
         const friendshipsResponse = await axiosInstance.get('/friendships', {
-          params: { user_id: user.id }, // Pasar user_id como parámetro
+          params: { user_id: user.id },
         });
-        console.log('Friendships:', friendshipsResponse.data.friendships);
-        const friendIds = friendshipsResponse.data.friendships.map(friendship => friendship.friend_id);
+        const friendIds = friendshipsResponse.data.friendships.map(
+          (friendship) => friendship.friend_id
+        );
 
         // Obtener todas las reseñas
         console.log('Fetching all reviews...');
         const reviewsResponse = await axiosInstance.get('/reviews');
-        console.log('All reviews:', reviewsResponse.data.reviews);
         const allReviews = reviewsResponse.data.reviews;
 
         // Filtrar reseñas de amigos
         const filteredReviews = await Promise.all(
           allReviews
-            .filter(review => friendIds.includes(review.user_id))
-            .map(async review => {
+            .filter((review) => friendIds.includes(review.user_id))
+            .map(async (review) => {
               const userName = await fetchUserName(review.user_id);
               const beerName = await fetchBeerName(review.beer_id);
               return { ...review, userName, beerName };
@@ -55,6 +63,34 @@ export const FeedProvider = ({ children }) => {
 
     loadFeedData();
   }, []);
+
+  useEffect(() => {
+    // Escuchar mensajes del WebSocket
+    if (lastMessage !== null) {
+      try {
+        const data = JSON.parse(lastMessage.data);
+
+        if (data.type === 'ping') return; // Ignorar mensajes de tipo ping
+
+        if (data.message && data.message.review) {
+          // Nueva reseña recibida desde el servidor
+          const newReview = data.message.review;
+
+          // Obtener el nombre de usuario y de la cerveza
+          fetchUserName(newReview.user_id).then((userName) => {
+            fetchBeerName(newReview.beer_id).then((beerName) => {
+              const updatedReview = { ...newReview, userName, beerName };
+
+              // Agregar la nueva reseña al feed
+              setReviews((prevReviews) => [updatedReview, ...prevReviews]);
+            });
+          });
+        }
+      } catch (error) {
+        console.error('Error processing WebSocket message:', error);
+      }
+    }
+  }, [lastMessage]);
 
   const fetchUserName = async (userId) => {
     try {

@@ -1,20 +1,20 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { FeedContext } from '../../contexts/FeedContext';
 import Footer from '../../PageElements/Footer';
 import { useNavigation } from '@react-navigation/native';
 
 function FeedScreen() {
   const { reviews } = useContext(FeedContext);
-  const navigation = useNavigation(); // Hook para la navegación
+  const navigation = useNavigation();
 
   const renderReviewItem = ({ item }) => (
     <TouchableOpacity
       style={styles.reviewCard}
-      onPress={() => navigation.navigate('BeerDetails', { id: item.beer_id })} // Cambiar a BeerDetails
+      onPress={() => navigation.navigate('BeerDetails', { id: item.beer_id })} // Navegación al detalle de la cerveza
     >
       <Text style={styles.reviewHeader}>
-        {item.userName} comento en {item.beerName}:
+        {item.userName || 'Usuario desconocido'} comentó en {item.beerName || 'Cerveza desconocida'}:
       </Text>
       <Text style={styles.reviewText}>"{item.text}"</Text>
       <Text style={styles.reviewRating}>Nota: {item.rating}</Text>
@@ -25,12 +25,19 @@ function FeedScreen() {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <FlatList
-          data={reviews}
-          renderItem={renderReviewItem}
-          keyExtractor={(item) => item.id.toString()}
-          ListEmptyComponent={<Text style={styles.noReviews}>No hay comentarios aún.</Text>}
-        />
+        {reviews.length === 0 ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#f5c000" />
+            <Text style={styles.loadingText}>Cargando comentarios...</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={reviews}
+            renderItem={renderReviewItem}
+            keyExtractor={(item) => item.id.toString()}
+            ListEmptyComponent={<Text style={styles.noReviews}>No hay comentarios aún.</Text>}
+          />
+        )}
       </View>
       <Footer />
     </View>
@@ -76,6 +83,15 @@ const styles = StyleSheet.create({
   noReviews: {
     textAlign: 'center',
     marginTop: 20,
+    color: '#f5c000',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
     color: '#f5c000',
   },
 });

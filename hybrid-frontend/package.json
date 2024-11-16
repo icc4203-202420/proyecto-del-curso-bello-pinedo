@@ -41,6 +41,7 @@
     "react-native-screens": "~4.0.0",
     "react-native-star-rating": "^1.1.0",
     "react-native-web": "~0.19.13",
+    "react-use-websocket": "^4.10.1",
     "typescript": "~5.3.3"
   },
   "devDependencies": {

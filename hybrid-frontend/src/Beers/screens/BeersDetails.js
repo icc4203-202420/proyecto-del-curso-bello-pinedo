@@ -115,6 +115,7 @@ function BeerDetails() {
         Brewery: {beer.breweries && beer.breweries.length > 0 ? beer.breweries[0].name : 'Unknown'}
       </Text>
       <Text style={styles.details}>Style: {beer.style || 'Unknown'}</Text>
+      <Text style={styles.details}>Type: {beer.type || 'Unknown'}</Text>
       <Text style={styles.details}>Hop: {beer.hop || 'Unknown'}</Text>
       <Text style={styles.details}>Yeast: {beer.yeast || 'Unknown'}</Text>
       <Text style={styles.details}>Malts: {beer.malts || 'Unknown'}</Text>
