@@ -1,8 +1,7 @@
 import axios from 'axios';
-import {NGROK_URL} from '@env';
 
 const axiosInstance = axios.create({
-  baseURL: `https://b091-181-42-46-50.ngrok-free.app/api/v1`, 
+  baseURL: `https://7843-190-164-206-237.ngrok-free.app/api/v1`, 
   headers: {
     'Content-Type': 'application/json',
   },

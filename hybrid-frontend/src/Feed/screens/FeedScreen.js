@@ -1,21 +1,25 @@
-// src/Feed/screens/FeedScreen.js
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { FeedContext } from '../../contexts/FeedContext';
 import Footer from '../../PageElements/Footer';
+import { useNavigation } from '@react-navigation/native';
 
 function FeedScreen() {
   const { reviews } = useContext(FeedContext);
+  const navigation = useNavigation(); // Hook para la navegación
 
   const renderReviewItem = ({ item }) => (
-    <View style={styles.reviewCard}>
+    <TouchableOpacity
+      style={styles.reviewCard}
+      onPress={() => navigation.navigate('BarsScreen', { barId: item.barId })}
+    >
       <Text style={styles.reviewHeader}>
         {item.userName} hizo el siguiente comentario en la cerveza {item.beerName}:
       </Text>
       <Text style={styles.reviewText}>"{item.text}"</Text>
       <Text style={styles.reviewRating}>Nota: {item.rating}</Text>
       <Text style={styles.reviewDate}>{new Date(item.created_at).toLocaleString()}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
