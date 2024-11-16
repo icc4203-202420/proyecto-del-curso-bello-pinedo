@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { View, Text, ScrollView, TextInput, Button, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Rating } from 'react-native-ratings'; 
 import axiosInstance from '../../PageElements/axiosInstance';
@@ -67,64 +67,63 @@ function BeerDetails() {
       });
   };
 
-  const fetchReviews = () => {
+  const fetchReviews = async () => {
     dispatch({ type: 'LOADING' });
-    axiosInstance.get('/reviews')
-      .then((res) => {
-        if (res.data && res.data.reviews) {
-          const filteredReviews = res.data.reviews.filter(review => review.beer_id === parseInt(id));
-          dispatch({ type: 'SUCCESS', payload: filteredReviews });
-        } else {
-          dispatch({ type: 'ERROR', payload: 'No reviews found.' });
-        }
-      })
-      .catch(() => {
-        dispatch({ type: 'ERROR', payload: 'Error fetching reviews.' });
-      });
-  };
+    try {
+      const reviewsResponse = await axiosInstance.get('/reviews');
+      if (reviewsResponse.data && reviewsResponse.data.reviews) {
+        const filteredReviews = reviewsResponse.data.reviews.filter(
+          (review) => review.beer_id === parseInt(id)
+        );
 
-  const handleRatingChange = (newRating) => {
-    setRating(newRating);
-  };
+        // Añade el handle del usuario a cada review
+        const reviewsWithHandle = await Promise.all(
+          filteredReviews.map(async (review) => {
+            try {
+              const userResponse = await axiosInstance.get(`/users/${review.user_id}`);
+              const userHandle = userResponse.data.handle || 'Unknown';
+              return { ...review, user_handle: userHandle };
+            } catch (error) {
+              console.error(`Error fetching user handle for user_id ${review.user_id}:`, error);
+              return { ...review, user_handle: 'Unknown' };
+            }
+          })
+        );
 
-  const handleCommentChange = (text) => {
-    setComment(text);
-  };
-
-  const handleSubmit = () => {
-    const wordCount = comment.trim().split(/\s+/).length;
-
-    if (wordCount < 15) {
-      setError('The comment must be at least 15 words.');
-      return;
-    }
-
-    if (!rating || rating < 1 || rating > 5) {
-      setError('The rating must be between 1 and 5.');
-      return;
-    }
-
-    setError('');
-    dispatch({ type: 'LOADING' });
-
-    if (currentUser) {
-      axiosInstance.post(`/users/${currentUser.id}/reviews`, {
-        beer_id: id,
-        rating: rating,
-        text: comment
-      })
-        .then(() => {
-          dispatch({ type: 'SUBMIT_SUCCESS', payload: { rating, text: comment, user_id: currentUser.id } });
-          setRating(0);
-          setComment('');
-        })
-        .catch(() => {
-          dispatch({ type: 'ERROR', payload: 'Error submitting the review. Please try again.' });
-        });
-    } else {
-      setError('User not found. Please log in.');
+        dispatch({ type: 'SUCCESS', payload: reviewsWithHandle });
+      } else {
+        dispatch({ type: 'ERROR', payload: 'No reviews found.' });
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      dispatch({ type: 'ERROR', payload: 'Error fetching reviews.' });
     }
   };
+
+  const renderReview = ({ item }) => (
+    <View style={styles.reviewCard}>
+      <Text style={styles.reviewText}>Rating: {item.rating}</Text>
+      <Text style={styles.reviewText}>Comment: {item.text}</Text>
+      <Text style={styles.reviewText}>Posted by: {item.user_handle || 'Unknown'}</Text>
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View style={styles.card}>
+      <Text style={styles.title}>{beer.name}</Text>
+      <Text style={styles.brewery}>
+        Brewery: {beer.breweries && beer.breweries.length > 0 ? beer.breweries[0].name : 'Unknown'}
+      </Text>
+      <Text style={styles.details}>Style: {beer.style || 'Unknown'}</Text>
+      <Text style={styles.details}>Hop: {beer.hop || 'Unknown'}</Text>
+      <Text style={styles.details}>Yeast: {beer.yeast || 'Unknown'}</Text>
+      <Text style={styles.details}>Malts: {beer.malts || 'Unknown'}</Text>
+      <Text style={styles.details}>IBU: {beer.ibu || 'Unknown'}</Text>
+      <Text style={styles.details}>Alcohol: {beer.alcohol || 'Unknown'}</Text>
+      <Text style={styles.details}>Blg: {beer.blg || 'Unknown'}</Text>
+      <Text style={styles.details}>Rating: {beer.avg_rating || 'No rating yet'}</Text>
+    </View>
+  );
 
   if (!beer) {
     return (
@@ -136,96 +135,32 @@ function BeerDetails() {
   }
 
   return (
-    <>
-      <ScrollView style={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>{beer.name}</Text>
-          <Text style={styles.brewery}>Brewery: {beer.breweries && beer.breweries.length > 0 ? beer.breweries[0].name : 'Unknown'}</Text>
-          <Text style={styles.details}>Style: {beer.style || 'Unknown'}</Text>
-          <Text style={styles.details}>Hop: {beer.hop || 'Unknown'}</Text>
-          <Text style={styles.details}>Yeast: {beer.yeast || 'Unknown'}</Text>
-          <Text style={styles.details}>Malts: {beer.malts || 'Unknown'}</Text>
-          <Text style={styles.details}>Ibu: {beer.ibu || 'Unknown'}</Text>
-          <Text style={styles.details}>Alcohol: {beer.alcohol || 'Unknown'}</Text>
-          <Text style={styles.details}>Blg: {beer.blg || 'Unknown'}</Text>
-          <Text style={styles.details}>Rating: {beer.avg_rating || 'No rating yet'}</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.subtitle}>Rate this beer:</Text>
-          <Rating
-            showRating
-            startingValue={rating}
-            onFinishRating={handleRatingChange}
-            style={styles.rating}
-            ratingCount={5}
-            ratingTextColor="#1E1E1E" 
-            imageSize={50}
-            tintColor="#1E1E1E"
-            selectedColor='#1E1E1E'
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Add a comment"
-            value={comment}
-            onChangeText={handleCommentChange}
-          />
-
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          {state.success ? <Text style={styles.success}>{state.success}</Text> : null}
-
-          <Button title="Submit Review" color="#1E1E1E" onPress={handleSubmit} />
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.subtitle}>Reviews</Text>
-          {state.loading ? (
-            <ActivityIndicator size="large" color="#f5c000" />
-          ) : state.reviews.length > 0 ? (
-            <FlatList
-              data={state.reviews}
-              renderItem={({ item }) => (
-                <View style={styles.reviewCard}>
-                  <Text style={styles.reviewText}>Rating: {item.rating}</Text>
-                  <Text style={styles.reviewText}>Comment: {item.text}</Text>
-                  <Text style={styles.reviewText}>Posted by: {item.user_id || 'Unknown'}</Text>
-                </View>
-              )}
-              keyExtractor={(item, index) => index.toString()}
-              initialNumToRender={5}
-            />
-          ) : (
-            <Text>No reviews yet.</Text>
-          )}
-        </View>
-        <Button style={styles.button2}
-          title="Where to Find It"
-          color="#f5c000"
-          onPress={() => navigation.navigate('BeerBars', { beerId: beer.id })}
-        />
-      </ScrollView>
-      <Footer /> 
-    </>
+    <View style={styles.outerContainer}>
+      <FlatList
+        data={state.reviews}
+        renderItem={renderReview}
+        keyExtractor={(item, index) => index.toString()}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={styles.container}
+        ListEmptyComponent={<Text style={styles.noReviews}>No reviews yet.</Text>}
+      />
+      <Footer /> {/* Footer fijo */}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#1E1E1E' },
+  outerContainer: { flex: 1, backgroundColor: '#1E1E1E' },
+  container: { padding: 20 },
   card: { backgroundColor: '#f5c000', padding: 20, borderRadius: 10, marginBottom: 20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   brewery: { fontSize: 16, marginBottom: 5 },
   details: { fontSize: 14, marginBottom: 5 },
-  subtitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#1E1E1E' },
-  rating: {  padding: 5, borderRadius: 10 },
-  input: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10, borderColor: '#ccc', borderWidth: 1 },
-  error: { color: 'red', marginBottom: 10 },
-  success: { color: 'green', marginBottom: 10 },
   reviewCard: { padding: 10, backgroundColor: '#fff', borderRadius: 5, marginBottom: 10 },
   reviewText: { fontSize: 14, marginBottom: 5 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E1E1E' },
   loadingText: { marginTop: 10, color: '#f5c000' },
-  button2: {marginBottom: 20},
+  noReviews: { color: '#f5c000', textAlign: 'center', marginTop: 20 },
 });
 
 export default BeerDetails;

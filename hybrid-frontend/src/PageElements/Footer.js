@@ -18,7 +18,7 @@ function Footer() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Feed')}>
             <Icon name="home" size={24} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BarSearch')}>

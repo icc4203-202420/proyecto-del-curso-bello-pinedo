@@ -11,10 +11,10 @@ function FeedScreen() {
   const renderReviewItem = ({ item }) => (
     <TouchableOpacity
       style={styles.reviewCard}
-      onPress={() => navigation.navigate('BarsScreen', { barId: item.barId })}
+      onPress={() => navigation.navigate('BeerDetails', { id: item.beer_id })} // Cambiar a BeerDetails
     >
       <Text style={styles.reviewHeader}>
-        {item.userName} hizo el siguiente comentario en la cerveza {item.beerName}:
+        {item.userName} comento en {item.beerName}:
       </Text>
       <Text style={styles.reviewText}>"{item.text}"</Text>
       <Text style={styles.reviewRating}>Nota: {item.rating}</Text>
