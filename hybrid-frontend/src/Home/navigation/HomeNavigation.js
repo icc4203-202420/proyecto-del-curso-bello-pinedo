@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import BeersSearch from "../../Beers/screens/BeerSearch";  // Pantalla de búsqueda de cervezas
 import BeerDetails from "../../Beers/screens/BeersDetails";  // Pantalla de detalles de una cerveza
+import BarSearch from "../../Bars/screens/BarSearch";  // Pantalla de búsqueda de bares
+import BarDetails from "../../Bars/screens/BarDetails";  // Pantalla de detalles de un bar
 import SignIn from "../../User/screens/SignIn";
 import SignUp from "../../User/screens/SignUp";
 import EventsSearch from "../../Events/screens/EventsSearch";
@@ -103,6 +105,30 @@ const HomeNavigation = () => {
           headerShadowVisible: false,
           headerTitleAlign: 'center',
          }}
+      />
+      <CoreStack.Screen
+        name="BarSearch"
+        component={BarSearch}
+        options={{
+          title: 'Bar Search',
+          headerStyle: { backgroundColor: '#1E1E1E' },
+          headerTintColor: '#f5c000',
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <CoreStack.Screen
+        name="BarDetails"
+        component={BarDetails}
+        options={{
+          title: 'Bar Details',
+          headerStyle: { backgroundColor: '#1E1E1E' },
+          headerTintColor: '#f5c000',
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+        }}
       />
       {/* Pantalla de Búsqueda de Eventos */}
       <CoreStack.Screen

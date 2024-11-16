@@ -21,7 +21,7 @@ function Footer() {
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Home')}>
             <Icon name="home" size={24} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BarsScreen')}>
+          <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('BarSearch')}>
             <Icon name="shopping-basket" size={24} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('EventsSearch')}>
