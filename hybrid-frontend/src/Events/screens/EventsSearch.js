@@ -20,7 +20,7 @@ function EventsSearch() {
     setLoading(true);
     try {
       const barsResponse = await axiosInstance.get('/bars');
-      const bars = barsResponse.data.bars;
+      const bars = barsResponse.data;
 
       const allEvents = await Promise.all(
         bars.map(async (bar) => {

@@ -20,7 +20,7 @@ function BarDetails() {
     try {
       const response = await axiosInstance.get(`/bars/${barId}`);
       console.log('API Response:', response.data);
-      setBar(response.data.bar); 
+      setBar(response.data); 
       setLoading(false);
     } catch (err) {
       console.error('Error fetching bar details:', err);
@@ -62,7 +62,9 @@ function BarDetails() {
           <Text style={styles.title}>{bar.name || 'Bar desconocido'}</Text>
           <Text style={styles.details}>Latitude: {bar.latitude ? bar.latitude.toFixed(6) : 'No disponible'}</Text>
           <Text style={styles.details}>Longitude: {bar.longitude ? bar.longitude.toFixed(6) : 'No disponible'}</Text>
-          <Text style={styles.details}>Address ID: {bar.address_id || 'Unknown'}</Text>
+          <Text style={styles.details}>Address: {bar.address.line1} {bar.address.line2}</Text>
+          <Text style={styles.details}>City: {bar.address.city}</Text>
+          <Text style={styles.details}>Counry: {bar.address.country.name}</Text>
         </View>
       </ScrollView>
       <Footer />

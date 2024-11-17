@@ -21,9 +21,9 @@ function BarSearch() {
     axiosInstance
       .get('/bars')
       .then((response) => {
-        if (response.data && response.data.bars) {
-          setBars(response.data.bars);  
-          setFilteredBars(response.data.bars);  
+        if (response.data) {
+          setBars(response.data);  
+          setFilteredBars(response.data);  
         } else {
           setBars([]);
           setFilteredBars([]);
