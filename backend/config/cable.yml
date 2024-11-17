@@ -1,7 +1,5 @@
 development:
-  adapter: redis
-  url: redis://localhost:6379/1
-  channel_prefix: your_app_development
+  adapter: async
 
   # Permitir conexiones desde cualquier dominio (para ngrok)
   allowed_request_origins:
