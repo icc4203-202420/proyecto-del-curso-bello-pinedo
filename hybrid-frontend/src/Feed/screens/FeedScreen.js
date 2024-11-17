@@ -18,10 +18,10 @@ function FeedScreen() {
       onPress={() => navigation.navigate('BeerDetails', { id: item.beer_id })}
     >
       <Text style={styles.reviewHeader}>
-        {item.userName || 'Usuario desconocido'} comentó en {item.beerName || 'Cerveza desconocida'}:
+        <Text style={styles.boldText}>{item.userName || 'Unknown'}</Text> commented on <Text style={styles.boldText}>{item.beerName || 'Unknown beer'}</Text>:
       </Text>
       <Text style={styles.reviewText}>"{item.text}"</Text>
-      <Text style={styles.reviewRating}>Nota: {item.rating}</Text>
+      <Text style={styles.reviewRating}>Score: {item.rating} / 5</Text>
       <Text style={styles.reviewDate}>{new Date(item.created_at).toLocaleString()}</Text>
     </TouchableOpacity>
   );
@@ -36,6 +36,12 @@ function FeedScreen() {
         break;
       case 'bar':
         setFilterOptions(bars.map((bar) => ({ label: bar.name, value: bar.name })));
+        break;
+      case 'beer':
+        setFilterOptions(beers.map((beer) => ({ label: beer.name, value: beer.name })));
+        break;
+      case 'country':
+        setFilterOptions(bars.map((beer) => ({ label: bar.name, value: bar.name })));
         break;
       default:
         setFilterOptions([]);
@@ -59,26 +65,28 @@ function FeedScreen() {
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <View style={styles.filterContainer}>
-          <Text style={styles.filterHeader}>Filtrar por:</Text>
+          <Text style={styles.filterHeader}>Filter by:</Text>
           <View style={styles.filterButtons}>
-            <Button title="Amistades" onPress={() => openFilterModal('friend')} />
-            <Button title="Bares" onPress={() => openFilterModal('bar')} />
+            <Button title="Friends" color={"#f5c000"} onPress={() => openFilterModal('friend')} />
+            <Button title="Bars" color={"#f5c000"} onPress={() => openFilterModal('bar')} />
+            <Button title="Beers" color={"#f5c000"} onPress={() => openFilterModal('beer')} />
+            <Button title="Country" color={"#f5c000"} onPress={() => openFilterModal('country')} />
           </View>
           {currentFilter && (
-            <Button title="Quitar Filtro" onPress={clearFilter} color="red" />
+            <Button title="Remove Filter" onPress={clearFilter} color="red" />
           )}
         </View>
         {reviews.length === 0 ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#f5c000" />
-            <Text style={styles.loadingText}>Cargando comentarios...</Text>
+            <Text style={styles.loadingText}>Loading Comments...</Text>
           </View>
         ) : (
           <FlatList
             data={reviews}
             renderItem={renderReviewItem}
             keyExtractor={(item) => item.id.toString()}
-            ListEmptyComponent={<Text style={styles.noReviews}>No hay comentarios aún.</Text>}
+            ListEmptyComponent={<Text style={styles.noReviews}>No Comments yet.</Text>}
           />
         )}
       </View>
@@ -86,7 +94,7 @@ function FeedScreen() {
       <Modal visible={isModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <ScrollView style={styles.modalContent}>
-            <Text style={styles.modalHeader}>Selecciona una opción</Text>
+            <Text style={styles.modalHeader}>Select an option</Text>
             {filterOptions.map((option, index) => (
               <TouchableOpacity
                 key={index}
@@ -96,7 +104,7 @@ function FeedScreen() {
                 <Text style={styles.modalOptionText}>{option.label}</Text>
               </TouchableOpacity>
             ))}
-            <Button title="Cancelar" onPress={() => setIsModalVisible(false)} color="red" />
+            <Button title="Cancel" onPress={() => setIsModalVisible(false)} color="red" />
           </ScrollView>
         </View>
       </Modal>
@@ -136,11 +144,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-  reviewHeader: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  reviewHeader: { fontSize: 16 },
+  boldText: { fontWeight: 'bold' }, 
   reviewText: {
     fontSize: 14,
     color: '#000',

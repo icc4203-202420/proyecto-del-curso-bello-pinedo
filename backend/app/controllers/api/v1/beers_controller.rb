@@ -1,26 +1,25 @@
 class API::V1::BeersController < ApplicationController
   include ImageProcessing
   include Authenticable
-
   respond_to :json
-  before_action :set_beer, only: [:show, :update, :destroy, :bars] # Agregamos :bars aquí
+  before_action :set_beer, only: [:show, :update, :destroy, :bars]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   # GET /beers
   def index
-    @beers = Beer.all
-    render json: { beers: @beers }, status: :ok
+    @beers = Beer.includes(brand: { brewery: :countries }).all
+    render json: @beers.as_json(include: { brand: { include: { brewery: { include: :countries } } } }), status: :ok
   end
 
   # GET /beers/:id
   def show
     if @beer.image.attached?
-      render json: @beer.as_json(include: { breweries: { only: [:name] } }).merge({ 
+      render json: @beer.as_json(include: { brand: { include: { brewery: { include: :countries } } } }).merge({ 
         image_url: url_for(@beer.image), 
-        thumbnail_url: url_for(@beer.thumbnail)}),
+        thumbnail_url: url_for(@beer.thumbnail) }),
         status: :ok
     else
-      render json: @beer.as_json(include: { breweries: { only: [:name] } }), status: :ok
+      render json: @beer.as_json(include: { brand: { include: { brewery: { include: :countries } } } }), status: :ok
     end 
   end
 
@@ -28,7 +27,6 @@ class API::V1::BeersController < ApplicationController
   def create
     @beer = Beer.new(beer_params.except(:image_base64))
     handle_image_attachment if beer_params[:image_base64]
-
     if @beer.save
       render json: { beer: @beer, message: 'Beer created successfully.' }, status: :created
     else
@@ -39,7 +37,6 @@ class API::V1::BeersController < ApplicationController
   # PATCH/PUT /beers/:id
   def update
     handle_image_attachment if beer_params[:image_base64]
-
     if @beer.update(beer_params.except(:image_base64))
       render json: { beer: @beer, message: 'Beer updated successfully.' }, status: :ok
     else
@@ -55,7 +52,7 @@ class API::V1::BeersController < ApplicationController
 
   # GET /beers/:id/bars
   def bars
-    @bars = @beer.bars # Asegúrate de que @beer se haya establecido correctamente
+    @bars = @beer.bars
     if @bars.present?
       render json: { bars: @bars }, status: :ok
     else

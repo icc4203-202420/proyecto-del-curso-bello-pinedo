@@ -115,7 +115,7 @@ function BeerDetails() {
       setError('The comment must be at least 15 words.');
       return;
     }
-  
+
     if (!rating || rating < 1 || rating > 5) {
       setError('The rating must be between 1 and 5.');
       return;
@@ -137,22 +137,14 @@ function BeerDetails() {
             payload: { rating, text: comment, user_id: currentUser.id },
           });
   
-          // Restablece los valores
-          setComment(''); // Vacía el campo de texto
+          // Reset values
+          setComment('');
           setSuccessMessage('Your review was submitted successfully!');
-          setTimeout(() => setSuccessMessage(''), 3000); // Ocultar después de 3 segundos
-
+          setTimeout(() => setSuccessMessage(''), 3000);
   
-          // Muestra un mensaje de éxito temporal
+          // Show success message temporarily
           setError('');
           dispatch({ type: 'SUCCESS', success: 'Review submitted successfully!' });
-  
-          // Recarga las reviews después de un submit exitoso
-          fetchReviews();
-  
-          setTimeout(() => {
-            dispatch({ type: 'SUCCESS', success: '' }); // Limpia el mensaje después de 3 segundos
-          }, 3000);
         })
         .catch(() => {
           dispatch({
@@ -163,8 +155,7 @@ function BeerDetails() {
     } else {
       setError('User not found. Please log in.');
     }
-  };  
-  
+  };
 
   const renderReview = ({ item }) => (
     <View style={styles.reviewCard}>
@@ -194,7 +185,7 @@ function BeerDetails() {
             <View style={styles.card}>
               <Text style={styles.title}>{beer.name}</Text>
               <Text style={styles.brewery}>
-                Brewery: {beer.breweries && beer.breweries.length > 0 ? beer.breweries[0].name : 'Unknown'}
+                Brewery: {beer.brand && beer.brand.brewery ? beer.brand.brewery.name : 'Unknown'}
               </Text>
               <Text style={styles.details}>Style: {beer.style || 'Unknown'}</Text>
               <Text style={styles.details}>Type: {beer.type || 'Unknown'}</Text>
@@ -205,6 +196,9 @@ function BeerDetails() {
               <Text style={styles.details}>Alcohol: {beer.alcohol || 'Unknown'}</Text>
               <Text style={styles.details}>Blg: {beer.blg || 'Unknown'}</Text>
               <Text style={styles.details}>Rating: {beer.avg_rating?.toFixed(1) || 'No rating yet'}</Text>
+              <Text style={styles.details}>
+                Countries: {beer.brand && beer.brand.brewery && beer.brand.brewery.countries ? beer.brand.brewery.countries.map(country => country.name).join(', ') : 'Unknown'}
+              </Text>
             </View>
             <View style={styles.card}>
               <Text style={styles.subtitle}>Rate this beer:</Text>
@@ -241,19 +235,17 @@ const styles = StyleSheet.create({
   card: { backgroundColor: '#f5c000', padding: 20, borderRadius: 10, marginBottom: 20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   details: { fontSize: 14, marginBottom: 5 },
+  brewery: { fontSize: 16, fontWeight: 'bold', marginBottom: 5 },
+  subtitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
+  input: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10, borderColor: '#ccc', borderWidth: 1, color: '#000', fontSize: 16 },
+  rating: { marginVertical: 20, alignSelf: 'center', backgroundColor: '#1E1E1E', borderRadius: 10, padding: 10, width: '90%' },
   reviewCard: { padding: 10, backgroundColor: '#fff', borderRadius: 5, marginBottom: 10 },
   reviewText: { fontSize: 14, marginBottom: 5 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E1E1E' },
   loadingText: { marginTop: 10, color: '#f5c000' },
   noReviews: { color: '#f5c000', textAlign: 'center', marginTop: 20 },
-  input: { backgroundColor: '#fff', padding: 10, borderRadius: 5, marginBottom: 10, borderColor: '#ccc',
-    borderWidth: 1, color: '#000', fontSize: 16, },
-  rating: {marginVertical: 20, alignSelf: 'center', backgroundColor: '#1E1E1E', 
-    borderRadius: 10, padding: 10, width: '90%', },
-  success: {color: 'green', marginBottom: 10, textAlign: 'center', fontWeight: 'bold',},
-  
-    
-  
+  error: { color: 'red', textAlign: 'center', marginBottom: 10 },
+  success: { color: 'green', textAlign: 'center', marginBottom: 10, fontWeight: 'bold' },
 });
 
 export default BeerDetails;

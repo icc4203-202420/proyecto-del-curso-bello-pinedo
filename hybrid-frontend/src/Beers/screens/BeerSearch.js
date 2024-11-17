@@ -21,9 +21,9 @@ function BeersSearch() {
     axiosInstance
       .get('/beers')
       .then((response) => {
-        if (response.data && response.data.beers) {
-          setBeers(response.data.beers);  
-          setFilteredBeers(response.data.beers);  
+        if (response.data && response.data) {
+          setBeers(response.data);  
+          setFilteredBeers(response.data);  
         } else {
           setBeers([]);
           setFilteredBeers([]);
