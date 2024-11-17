@@ -1,18 +1,21 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Button, Modal, ScrollView } from 'react-native';
 import { FeedContext } from '../../contexts/FeedContext';
 import Footer from '../../PageElements/Footer';
 import { useNavigation } from '@react-navigation/native';
 
 function FeedScreen() {
-  const { reviews, setFilter } = useContext(FeedContext); // Incluye setFilter del contexto
+  const { reviews, setFilter, friends, bars } = useContext(FeedContext);
   const [currentFilter, setCurrentFilter] = useState(null);
+  const [filterOptions, setFilterOptions] = useState([]);
+  const [filterType, setFilterType] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const navigation = useNavigation();
 
   const renderReviewItem = ({ item }) => (
     <TouchableOpacity
       style={styles.reviewCard}
-      onPress={() => navigation.navigate('BeerDetails', { id: item.beer_id })} // Navegación al detalle de la cerveza
+      onPress={() => navigation.navigate('BeerDetails', { id: item.beer_id })}
     >
       <Text style={styles.reviewHeader}>
         {item.userName || 'Usuario desconocido'} comentó en {item.beerName || 'Cerveza desconocida'}:
@@ -23,9 +26,28 @@ function FeedScreen() {
     </TouchableOpacity>
   );
 
-  const handleFilterChange = (type, value) => {
-    setCurrentFilter({ type, value });
-    setFilter({ type, value });
+  const openFilterModal = (type) => {
+    setFilterType(type);
+    setIsModalVisible(true);
+
+    switch (type) {
+      case 'friend':
+        setFilterOptions(friends.map((friend) => ({ label: friend.user_handle, value: friend.friend_id })));
+        break;
+      case 'bar':
+        setFilterOptions(bars.map((bar) => ({ label: bar.name, value: bar.name })));
+        break;
+      default:
+        setFilterOptions([]);
+        break;
+    }
+  };
+
+  const applyFilter = (selectedOption) => {
+    if (!selectedOption) return;
+    setCurrentFilter({ type: filterType, value: selectedOption.value });
+    setFilter({ type: filterType, value: selectedOption.value });
+    setIsModalVisible(false);
   };
 
   const clearFilter = () => {
@@ -39,22 +61,8 @@ function FeedScreen() {
         <View style={styles.filterContainer}>
           <Text style={styles.filterHeader}>Filtrar por:</Text>
           <View style={styles.filterButtons}>
-            <Button
-              title="Amistad: Amigo1"
-              onPress={() => handleFilterChange('friend', 'Amigo1')}
-            />
-            <Button
-              title="Bar: Bar XYZ"
-              onPress={() => handleFilterChange('bar', 'Bar XYZ')}
-            />
-            <Button
-              title="País: Chile"
-              onPress={() => handleFilterChange('country', 'Chile')}
-            />
-            <Button
-              title="Cerveza: Cerveza ABC"
-              onPress={() => handleFilterChange('beer', 'Cerveza ABC')}
-            />
+            <Button title="Amistades" onPress={() => openFilterModal('friend')} />
+            <Button title="Bares" onPress={() => openFilterModal('bar')} />
           </View>
           {currentFilter && (
             <Button title="Quitar Filtro" onPress={clearFilter} color="red" />
@@ -74,6 +82,24 @@ function FeedScreen() {
           />
         )}
       </View>
+
+      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <ScrollView style={styles.modalContent}>
+            <Text style={styles.modalHeader}>Selecciona una opción</Text>
+            {filterOptions.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.modalOption}
+                onPress={() => applyFilter(option)}
+              >
+                <Text style={styles.modalOptionText}>{option.label}</Text>
+              </TouchableOpacity>
+            ))}
+            <Button title="Cancelar" onPress={() => setIsModalVisible(false)} color="red" />
+          </ScrollView>
+        </View>
+      </Modal>
       <Footer />
     </View>
   );
@@ -146,6 +172,30 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     color: '#f5c000',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    margin: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalOption: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  modalOptionText: {
+    fontSize: 16,
   },
 });
 

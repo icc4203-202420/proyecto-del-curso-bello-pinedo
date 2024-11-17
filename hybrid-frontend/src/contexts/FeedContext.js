@@ -2,17 +2,19 @@ import React, { createContext, useEffect, useState } from 'react';
 import axiosInstance from '../PageElements/axiosInstance';
 import * as SecureStore from 'expo-secure-store';
 import useWebSocket from 'react-use-websocket';
-import config from '../config/config'; 
+import config from '../config/config';
 
 export const FeedContext = createContext();
 
 export const FeedProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [filter, setFilter] = useState(null); // Estado del filtro actual
+  const [friends, setFriends] = useState([]);
+  const [bars, setBars] = useState([]);
+  const [filter, setFilter] = useState(null);
 
-
-  const { lastMessage, sendMessage } = useWebSocket(config.WS_BASE_URL, {     onOpen: () => console.log('Connected to WebSocket'),
+  const { lastMessage, sendMessage } = useWebSocket(config.WS_BASE_URL, {
+    onOpen: () => console.log('Connected to WebSocket'),
     onClose: () => console.log('Disconnected from WebSocket'),
     shouldReconnect: () => true,
   });
@@ -20,6 +22,7 @@ export const FeedProvider = ({ children }) => {
   useEffect(() => {
     const loadFeedData = async () => {
       try {
+        // Obtener el usuario actual desde SecureStore
         const storedUser = await SecureStore.getItemAsync('user');
         if (!storedUser) {
           console.error('No user data found in storage.');
@@ -28,14 +31,17 @@ export const FeedProvider = ({ children }) => {
         const user = JSON.parse(storedUser);
         setCurrentUserId(user.id);
 
+        // Obtener amistades
         console.log(`Fetching friendships for user ${user.id}...`);
         const friendshipsResponse = await axiosInstance.get('/friendships', {
           params: { user_id: user.id },
         });
-        const friendIds = friendshipsResponse.data.friendships.map(
-          (friendship) => friendship.friend_id
-        );
 
+        const friendships = friendshipsResponse.data.friendships;
+        setFriends(friendships); // Guarda toda la información de amigos
+        const friendIds = friendships.map((friendship) => friendship.friend_id);
+
+        // Obtener y filtrar reseñas
         console.log('Fetching all reviews...');
         const reviewsResponse = await axiosInstance.get('/reviews');
         const allReviews = reviewsResponse.data.reviews;
@@ -52,6 +58,11 @@ export const FeedProvider = ({ children }) => {
 
         console.log('Filtered reviews:', filteredReviews);
         setReviews(filteredReviews);
+
+        // Obtener bares
+        console.log('Fetching all bars...');
+        const barsResponse = await axiosInstance.get('/bars');
+        setBars(barsResponse.data.bars);
       } catch (error) {
         console.error('Error loading feed data:', error);
       }
@@ -65,7 +76,7 @@ export const FeedProvider = ({ children }) => {
       try {
         const data = JSON.parse(lastMessage.data);
 
-        if (data.type === 'ping') return; 
+        if (data.type === 'ping') return;
 
         if (data.message && data.message.review) {
           const newReview = data.message.review;
@@ -109,7 +120,7 @@ export const FeedProvider = ({ children }) => {
     if (!filter) return true; // Sin filtro, muestra todo
     switch (filter.type) {
       case 'friend':
-        return review.user_handle === filter.value;
+        return review.user_id === filter.value; // Filtra por ID de amigo
       case 'bar':
         return review.bar_name === filter.value;
       case 'country':
@@ -122,7 +133,14 @@ export const FeedProvider = ({ children }) => {
   });
 
   return (
-    <FeedContext.Provider value={{ reviews: filteredReviews, setFilter }}>
+    <FeedContext.Provider
+      value={{
+        reviews: filteredReviews,
+        friends,
+        bars,
+        setFilter,
+      }}
+    >
       {children}
     </FeedContext.Provider>
   );
