@@ -102,7 +102,7 @@ function EventsDetails() {
   };
 
   const handleViewGallery = () => {
-    navigation.navigate('EventsGallery', { barId, eventId });
+    navigation.navigate('EventsGallery', { barId: barId, eventId: eventId });
   };
 
   if (!event) {

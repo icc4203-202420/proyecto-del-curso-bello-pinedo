@@ -1,11 +1,12 @@
-import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
 import { FeedContext } from '../../contexts/FeedContext';
 import Footer from '../../PageElements/Footer';
 import { useNavigation } from '@react-navigation/native';
 
 function FeedScreen() {
-  const { reviews } = useContext(FeedContext);
+  const { reviews, setFilter } = useContext(FeedContext); // Incluye setFilter del contexto
+  const [currentFilter, setCurrentFilter] = useState(null);
   const navigation = useNavigation();
 
   const renderReviewItem = ({ item }) => (
@@ -22,9 +23,43 @@ function FeedScreen() {
     </TouchableOpacity>
   );
 
+  const handleFilterChange = (type, value) => {
+    setCurrentFilter({ type, value });
+    setFilter({ type, value });
+  };
+
+  const clearFilter = () => {
+    setCurrentFilter(null);
+    setFilter(null);
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
+        <View style={styles.filterContainer}>
+          <Text style={styles.filterHeader}>Filtrar por:</Text>
+          <View style={styles.filterButtons}>
+            <Button
+              title="Amistad: Amigo1"
+              onPress={() => handleFilterChange('friend', 'Amigo1')}
+            />
+            <Button
+              title="Bar: Bar XYZ"
+              onPress={() => handleFilterChange('bar', 'Bar XYZ')}
+            />
+            <Button
+              title="País: Chile"
+              onPress={() => handleFilterChange('country', 'Chile')}
+            />
+            <Button
+              title="Cerveza: Cerveza ABC"
+              onPress={() => handleFilterChange('beer', 'Cerveza ABC')}
+            />
+          </View>
+          {currentFilter && (
+            <Button title="Quitar Filtro" onPress={clearFilter} color="red" />
+          )}
+        </View>
         {reviews.length === 0 ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#f5c000" />
@@ -50,6 +85,24 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 10,
     backgroundColor: '#1E1E1E',
+  },
+  filterContainer: {
+    marginBottom: 20,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  filterHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#f5c000',
+    marginBottom: 10,
+  },
+  filterButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   reviewCard: {
     backgroundColor: '#f5c000',

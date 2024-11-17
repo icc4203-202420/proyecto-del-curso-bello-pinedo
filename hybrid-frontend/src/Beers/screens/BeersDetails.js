@@ -204,7 +204,7 @@ function BeerDetails() {
               <Text style={styles.details}>IBU: {beer.ibu || 'Unknown'}</Text>
               <Text style={styles.details}>Alcohol: {beer.alcohol || 'Unknown'}</Text>
               <Text style={styles.details}>Blg: {beer.blg || 'Unknown'}</Text>
-              <Text style={styles.details}>Rating: {beer.avg_rating.toFixed(1) || 'No rating yet'}</Text>
+              <Text style={styles.details}>Rating: {beer.avg_rating?.toFixed(1) || 'No rating yet'}</Text>
             </View>
             <View style={styles.card}>
               <Text style={styles.subtitle}>Rate this beer:</Text>

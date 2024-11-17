@@ -55,7 +55,7 @@ function EventsSearch() {
   const renderEventItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('EventsDetails', { id: item.id })}
+      onPress={() => navigation.navigate('EventsDetails', { id: item.id, barId: item.bar_id })}
     >
       <Text style={styles.eventName}>{item.name}</Text>
       <Text style={styles.eventDate}>Date: {new Date(item.date).toLocaleString()}</Text>

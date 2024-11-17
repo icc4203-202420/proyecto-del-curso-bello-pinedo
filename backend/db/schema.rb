@@ -156,7 +156,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_04_231326) do
     t.integer "friend_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "bar_id", null: false
+    t.integer "bar_id"
     t.integer "event_id"
     t.index ["bar_id"], name: "index_friendships_on_bar_id"
     t.index ["event_id"], name: "index_friendships_on_event_id"

@@ -61,7 +61,7 @@ function EventsGallery() {
   };
 
   const handleImageClick = (id) => {
-    navigation.navigate('EventsPictureDetails', { barId, eventId, pictureId: id });
+    navigation.navigate('EventsPictureDetails', { barId: barId, eventId: eventId, pictureId: id });
   };
 
   return (
@@ -115,7 +115,7 @@ function EventsGallery() {
         <Button
           title="Upload Photos"
           color="#f5c000"
-          onPress={() => navigation.navigate('EventsPictureUpload', { barId, eventId })}
+          onPress={() => navigation.navigate('EventsPictureUpload', { barId: barId , eventId: eventId })}
         />
       </View>
 

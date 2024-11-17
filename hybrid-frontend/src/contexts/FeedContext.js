@@ -2,17 +2,17 @@ import React, { createContext, useEffect, useState } from 'react';
 import axiosInstance from '../PageElements/axiosInstance';
 import * as SecureStore from 'expo-secure-store';
 import useWebSocket from 'react-use-websocket';
-import config from '../config/config'; // Importa configuración
+import config from '../config/config'; 
 
 export const FeedContext = createContext();
 
 export const FeedProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [filter, setFilter] = useState(null); // Estado del filtro actual
 
-  // Configura el WebSocket
-  const { lastMessage, sendMessage } = useWebSocket(config.WS_BASE_URL, { // Usa la URL del archivo config.js
-    onOpen: () => console.log('Connected to WebSocket'),
+
+  const { lastMessage, sendMessage } = useWebSocket(config.WS_BASE_URL, {     onOpen: () => console.log('Connected to WebSocket'),
     onClose: () => console.log('Disconnected from WebSocket'),
     shouldReconnect: () => true,
   });
@@ -20,7 +20,6 @@ export const FeedProvider = ({ children }) => {
   useEffect(() => {
     const loadFeedData = async () => {
       try {
-        // Obtener el usuario actual desde SecureStore
         const storedUser = await SecureStore.getItemAsync('user');
         if (!storedUser) {
           console.error('No user data found in storage.');
@@ -29,7 +28,6 @@ export const FeedProvider = ({ children }) => {
         const user = JSON.parse(storedUser);
         setCurrentUserId(user.id);
 
-        // Obtener amistades del usuario actual
         console.log(`Fetching friendships for user ${user.id}...`);
         const friendshipsResponse = await axiosInstance.get('/friendships', {
           params: { user_id: user.id },
@@ -38,12 +36,10 @@ export const FeedProvider = ({ children }) => {
           (friendship) => friendship.friend_id
         );
 
-        // Obtener todas las reseñas
         console.log('Fetching all reviews...');
         const reviewsResponse = await axiosInstance.get('/reviews');
         const allReviews = reviewsResponse.data.reviews;
 
-        // Filtrar reseñas de amigos
         const filteredReviews = await Promise.all(
           allReviews
             .filter((review) => friendIds.includes(review.user_id))
@@ -65,23 +61,19 @@ export const FeedProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // Escuchar mensajes del WebSocket
     if (lastMessage !== null) {
       try {
         const data = JSON.parse(lastMessage.data);
 
-        if (data.type === 'ping') return; // Ignorar mensajes de tipo ping
+        if (data.type === 'ping') return; 
 
         if (data.message && data.message.review) {
-          // Nueva reseña recibida desde el servidor
           const newReview = data.message.review;
 
-          // Obtener el nombre de usuario y de la cerveza
           fetchUserName(newReview.user_id).then((userName) => {
             fetchBeerName(newReview.beer_id).then((beerName) => {
               const updatedReview = { ...newReview, userName, beerName };
 
-              // Agregar la nueva reseña al feed
               setReviews((prevReviews) => [updatedReview, ...prevReviews]);
             });
           });
@@ -113,8 +105,24 @@ export const FeedProvider = ({ children }) => {
     }
   };
 
+  const filteredReviews = reviews.filter((review) => {
+    if (!filter) return true; // Sin filtro, muestra todo
+    switch (filter.type) {
+      case 'friend':
+        return review.user_handle === filter.value;
+      case 'bar':
+        return review.bar_name === filter.value;
+      case 'country':
+        return review.country === filter.value;
+      case 'beer':
+        return review.beer_name === filter.value;
+      default:
+        return true;
+    }
+  });
+
   return (
-    <FeedContext.Provider value={{ reviews }}>
+    <FeedContext.Provider value={{ reviews: filteredReviews, setFilter }}>
       {children}
     </FeedContext.Provider>
   );
