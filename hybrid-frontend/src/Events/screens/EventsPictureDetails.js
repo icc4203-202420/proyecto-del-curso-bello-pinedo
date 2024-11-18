@@ -80,7 +80,7 @@ function EventsPictureDetails() {
             resizeMode="contain"
           />
           <Text style={styles.uploadedBy}>Uploaded by: {picture.user.name}</Text>
-          <Text style={styles.uploadedBy}> {picture.description}</Text>
+          <Text style={styles.uploadedBy}>Description: {picture.description}</Text>
 
 
           <View style={styles.tagsContainer}>

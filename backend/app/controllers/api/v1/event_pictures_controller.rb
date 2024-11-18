@@ -1,5 +1,5 @@
 class API::V1::EventPicturesController < ApplicationController
-  before_action :set_event, only: [:create, :show_images, :tag_user, :show]
+  before_action :set_event, only: [:create, :show_images, :tag_user, :show, :images_by_event]
   before_action :set_event_picture, only: [:show, :tag_user]
 
   def index
@@ -17,6 +17,26 @@ class API::V1::EventPicturesController < ApplicationController
 
     render json: { images: pictures }, status: :ok
   end
+
+  def images_by_event
+    if @event
+      pictures = @event.event_pictures.map do |picture|
+        {
+          id: picture.id,
+          url: url_for(picture.picture),
+          user_id: picture.user.id,
+          event_id: picture.event.id,
+          description: picture.description,
+          tags: picture.tagged_users.pluck(:id),
+          thumbnail_url: url_for(picture.picture.variant(resize: "100x100"))
+        }
+      end
+  
+      render json: { images: pictures }, status: :ok
+    else
+      render json: { error: "Event not found." }, status: :not_found
+    end
+  end  
 
   def show_images
     pictures = @event.event_pictures.map do |picture|
@@ -88,9 +108,14 @@ class API::V1::EventPicturesController < ApplicationController
   private
 
   def set_event
-    @event = Event.find_by(id: params[:event_id])
-    render json: { error: "Event not found." }, status: :not_found unless @event
+    Rails.logger.info("Looking for event with event_id=#{params[:event_id]} and bar_id=#{params[:bar_id]}")
+    @event = Event.find_by(id: params[:event_id], bar_id: params[:bar_id])
+    if @event.nil?
+      Rails.logger.error("No event found for event_id=#{params[:event_id]} and bar_id=#{params[:bar_id]}")
+      render json: { error: "Event not found." }, status: :not_found
+    end
   end
+  
 
   def event_picture_params
     # No incluye `tag_user_id` porque no es parte directa del modelo

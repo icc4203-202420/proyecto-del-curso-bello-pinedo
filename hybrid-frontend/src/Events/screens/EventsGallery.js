@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView, Button, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Video } from 'expo-av';
+import { useVideoPlayer, VideoView } from 'expo-video'; // Importa los nuevos componentes
 import axiosInstance from '../../PageElements/axiosInstance';
 
 function EventsGallery() {
-  const { barId, eventId } = useRoute().params; 
+  const { barId, eventId } = useRoute().params;
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [noImagesAvailable, setNoImagesAvailable] = useState(false);
   const navigation = useNavigation();
+
+  const videoPlayer = useVideoPlayer(); // Crea una instancia del reproductor de video
 
   const getBaseURL = () => {
     return axiosInstance.defaults.baseURL.replace(/\/api.*/, '');
   };
-  
 
   useEffect(() => {
     fetchGallery();
@@ -24,22 +24,17 @@ function EventsGallery() {
   const fetchGallery = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get(`/bars/${barId}/events/${eventId}/images`);
-      const galleryData = res.data.images || [];
-  
-      // Dynamically get the base URL for the video file
+      const response = await axiosInstance.get(`/bars/${barId}/events/${eventId}/images_by_event`);
+      const galleryData = response.data.images || [];
       const videoUrl = `${getBaseURL()}/events/${eventId}/summary_video.mp4`;
-      if (galleryData.length > 0 || res.data.video_url) {
-        galleryData.push({ type: 'video', url: videoUrl });
-        setNoImagesAvailable(false);
+
+      if (galleryData.length > 0 || response.data.video_url) {
+        setGallery([...galleryData, { type: 'video', url: videoUrl }]);
       } else {
-        setNoImagesAvailable(true); // Set this if there are no images
+        setGallery([]);
       }
-  
-      console.log("Gallery data with video:", galleryData);
-      setGallery(galleryData);
     } catch (error) {
-      console.error("Error fetching gallery:", error);
+      console.error('Error fetching gallery:', error);
       setError('Error loading gallery.');
     } finally {
       setLoading(false);
@@ -49,9 +44,9 @@ function EventsGallery() {
   const handleGenerateSummary = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.post(`/bars/${barId}/events/${eventId}/generate_summary`);
+      await axiosInstance.post(`/bars/${barId}/events/${eventId}/generate_summary`);
       Alert.alert('Success', 'Video summary created successfully!');
-      fetchGallery();  // Refresh the gallery after video generation
+      fetchGallery();
     } catch (error) {
       console.error('Error generating video summary:', error);
       Alert.alert('Error', 'There was an issue generating the video. Please try again.');
@@ -61,7 +56,7 @@ function EventsGallery() {
   };
 
   const handleImageClick = (id) => {
-    navigation.navigate('EventsPictureDetails', { barId: barId, eventId: eventId, pictureId: id });
+    navigation.navigate('EventsPictureDetails', { barId, eventId, pictureId: id });
   };
 
   return (
@@ -75,39 +70,33 @@ function EventsGallery() {
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {!loading && noImagesAvailable && (
-        <Text style={styles.noImagesText}>No images available for this event.</Text>
-      )}
-
-      {!loading && !error && gallery.length === 0 && (
+      {!loading && gallery.length === 0 && (
         <Text style={styles.noImagesText}>No images or videos found for this event.</Text>
       )}
 
       {!loading && gallery.length > 0 && (
         <View style={styles.imagesContainer}>
           {gallery.map((item, index) => (
-            item.url ? (
-              item.type === 'video' ? (
-                <View key={index} style={styles.videoWrapper}>
-                  <Video
-                    source={{ uri: item.url }}
-                    rate={1.0}
-                    volume={1.0}
-                    isMuted={false}
-                    resizeMode="cover"
-                    useNativeControls
-                    style={styles.video}
-                  />
-                </View>
-              ) : (
-                <TouchableOpacity key={index} style={styles.imageWrapper} onPress={() => handleImageClick(item.id)}>
-                  <Image source={{ uri: item.url }} style={styles.image} />
-                </TouchableOpacity>
-              )
+          item.url ? (
+            item.type === 'video' ? (
+              <View key={index} style={styles.videoWrapper}>
+                <VideoView
+                  player={videoPlayer}
+                  style={styles.video}
+                  allowsFullscreen
+                  allowsPictureInPicture
+                />
+                {videoPlayer.source !== item.url && videoPlayer.replace(item.url)}
+              </View>
             ) : (
-              <Text key={index} style={styles.errorText}>Invalid item in gallery</Text>
+              <TouchableOpacity key={index} style={styles.imageWrapper} onPress={() => handleImageClick(item.id)}>
+                <Image source={{ uri: item.url }} style={styles.image} />
+              </TouchableOpacity>
             )
-          ))}
+          ) : (
+            <Text key={index} style={styles.errorText}>Invalid item in gallery</Text>
+          )
+        ))}
         </View>
       )}
 
@@ -115,7 +104,7 @@ function EventsGallery() {
         <Button
           title="Upload Photos"
           color="#f5c000"
-          onPress={() => navigation.navigate('EventsPictureUpload', { barId: barId , eventId: eventId })}
+          onPress={() => navigation.navigate('EventsPictureUpload', { barId, eventId })}
         />
       </View>
 

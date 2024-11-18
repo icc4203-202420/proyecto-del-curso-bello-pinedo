@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       resources :bars do
         resources :events do
           post 'generate_summary', on: :member
+          get 'images_by_event', to: 'event_pictures#images_by_event'
           resources :images, only: [:create, :index, :show], controller: 'event_pictures' do
             post 'tag_user', on: :member  # Ruta personalizada para etiquetar usuarios en una imagen específica
           end
