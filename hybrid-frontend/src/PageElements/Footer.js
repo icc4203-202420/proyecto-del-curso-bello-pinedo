@@ -1,18 +1,21 @@
-import React from "react";
+import React, {useContext} from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StyleSheet, View, TouchableOpacity, SafeAreaView } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Don't forget to import Icon
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import { FeedContext } from "../contexts/FeedContext";
 
 function Footer() {
     const navigation = useNavigation(); 
+    const { unsubscribe } = useContext(FeedContext);
     const handleLogout = async () => {
         try {
             await AsyncStorage.removeItem('user'); 
+            unsubscribe();
             navigation.navigate('SignIn');
         } catch (error) {
             console.error('Error removing user data:', error);
-        }
+        } 
     };
 
     return (

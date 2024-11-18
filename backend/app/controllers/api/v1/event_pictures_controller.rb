@@ -61,6 +61,21 @@ class API::V1::EventPicturesController < ApplicationController
         tags: event_picture.tagged_users.pluck(:id, :handle)
       }, status: :created
     else
+      event_data = {
+        id: @event.id,
+        bar_id: @event.bar_id,
+        name: @event.name,
+        description: @event.description,
+        user_id: user.id,
+        userName: user.handle,
+        created_at: @event.created_at,
+        type: 'event',
+      }
+
+      ActionCable.server.broadcast('feed_channel', event_data)
+      render json: { message: 'Image uploaded successfully' }, status: :created
+    else
+      Rails.logger.error("Failed to save event picture: #{event_picture.errors.full_messages}")
       render json: { errors: event_picture.errors.full_messages }, status: :unprocessable_entity
     end
   end
