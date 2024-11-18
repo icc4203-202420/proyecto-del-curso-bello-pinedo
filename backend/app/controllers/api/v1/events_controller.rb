@@ -49,7 +49,7 @@ class API::V1::EventsController < ApplicationController
   def generate_summary
     video_generator = VideoGeneratorService.new(@event)
     video_path = video_generator.generate_video
-
+  
     if video_path
       video_url = "/events/#{@event.id}/summary_video.mp4"
       render json: { video_url: video_url }, status: :created
@@ -58,7 +58,11 @@ class API::V1::EventsController < ApplicationController
     end
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'Event not found' }, status: :not_found
-  end 
+  rescue => e
+    Rails.logger.error("Error generating video: #{e.message}")
+    render json: { error: 'Unexpected error occurred while generating video' }, status: :internal_server_error
+  end
+   
 
   private
 

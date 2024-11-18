@@ -12,7 +12,10 @@ class VideoGeneratorService
     output_dir = File.dirname(@output_path)
     FileUtils.mkdir_p(output_dir) unless Dir.exist?(output_dir)
   
-    # Create input.txt file with duration for each image
+    # Elimina el archivo de video existente si ya existe
+    File.delete(@output_path) if File.exist?(@output_path)
+  
+    # Crear archivo de entrada para FFmpeg
     input_file = Rails.root.join("tmp", "input.txt")
     File.open(input_file, "w") do |file|
       @image_paths.each do |image_path|
@@ -22,13 +25,17 @@ class VideoGeneratorService
       file.puts "file '#{@image_paths.last}'" if @image_paths.any?
     end
   
-    # FFmpeg command with resolution scaling to nearest even dimensions
-    command = "ffmpeg -f concat -safe 0 -i '#{input_file}' -vf 'scale=ceil(iw/2)*2:ceil(ih/2)*2' -c:v libx264 -pix_fmt yuv420p #{@output_path}"
-    system(command)
+    # Comando FFmpeg
+    command = "ffmpeg -f concat -safe 0 -i '#{input_file}' " \
+              "-vf 'scale=1280:720:force_original_aspect_ratio=decrease' " \
+              "-preset ultrafast -crf 28 -c:v libx264 -pix_fmt yuv420p #{@output_path}"
+    success = system(command)
+  
+    success ? @output_path : nil
   ensure
     FileUtils.rm(input_file) if File.exist?(input_file)
   end
-
+  
   private
 
   # Método para obtener la ruta física del archivo almacenado localmente en Active Storage
