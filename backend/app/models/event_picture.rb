@@ -10,6 +10,27 @@ class EventPicture < ApplicationRecord
   def thumbnail
     picture.variant(resize_to_limit: [100, 100]).processed
   end
+
+  after_create_commit { broadcast_new_event_picture }
+
+  private
+
+  def broadcast_new_event_picture
+    ActionCable.server.broadcast "feed_channel", {
+      id: id,
+      event_id: event_id,
+      bar_id: event.bar_id,
+      name: event.name,
+      description: event.description,
+      user_id: user_id,
+      userName: user.handle,
+      url: Rails.application.routes.url_helpers.rails_blob_url(picture, only_path: true),
+      thumbnail_url: Rails.application.routes.url_helpers.rails_representation_url(thumbnail, only_path: true),
+      created_at: created_at,
+      type: 'event'
+    }
+  end
+
 end
 
 class Tag < ApplicationRecord

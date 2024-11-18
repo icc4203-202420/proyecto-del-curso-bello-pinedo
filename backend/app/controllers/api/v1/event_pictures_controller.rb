@@ -39,10 +39,11 @@ class API::V1::EventPicturesController < ApplicationController
     if event_picture.save
       event_data = {
         id: @event.id,
+        bar_id: @event.bar_id,
         name: @event.name,
         description: @event.description,
         user_id: user.id,
-        handle: user.handle,
+        userName: user.handle,
         created_at: @event.created_at,
         type: 'event',
       }

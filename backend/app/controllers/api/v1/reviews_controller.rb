@@ -24,6 +24,7 @@ class API::V1::ReviewsController < ApplicationController
       text: @review.text,
       rating: @review.rating,
       beer_id: @review.beer_id,
+      user_id: @review.user_id,
       beerName: @review.beer.name,
       userName: @review.user.handle,
       created_at: @review.created_at,
