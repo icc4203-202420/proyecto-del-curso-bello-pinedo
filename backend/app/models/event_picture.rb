@@ -6,6 +6,7 @@ class EventPicture < ApplicationRecord
   has_many :tagged_users, through: :tags, source: :user
 
   validates :picture, presence: true
+  validates :user, presence: true
 
   def thumbnail
     picture.variant(resize_to_limit: [100, 100]).processed

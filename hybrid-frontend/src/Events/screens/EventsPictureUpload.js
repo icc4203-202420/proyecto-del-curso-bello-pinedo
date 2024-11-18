@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import axiosInstance from '../../PageElements/axiosInstance';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import * as SecureStore from 'expo-secure-store';
 
 function EventPictureUpload() {
   const [imageUri, setImageUri] = useState(null);
@@ -40,6 +41,20 @@ function EventPictureUpload() {
       setUsers(response.data);
     } catch (err) {
       console.error('Error fetching users:', err);
+    }
+  };
+
+  const getUserIdFromSecureStore = async () => {
+    try {
+      const userData = await SecureStore.getItemAsync('user');
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        return parsedData.id; // Cambia `id` si el campo tiene un nombre diferente
+      }
+      return null;
+    } catch (err) {
+      console.error('Error retrieving user data from SecureStore:', err);
+      return null;
     }
   };
 
@@ -81,37 +96,47 @@ function EventPictureUpload() {
       Alert.alert('Please select an image');
       return;
     }
-
+  
     setLoading(true);
     setError('');
     setSuccess('');
-
-    const formData = new FormData();
-    formData.append('image', {
-      uri: imageUri,
-      name: 'event_image.jpg',
-      type: 'image/jpeg',
-    });
-    formData.append('description', description);
-    if (selectedUser) formData.append('tag_user_id', selectedUser);
-
+  
     try {
+      const userId = await getUserIdFromSecureStore();
+      if (!userId) {
+        setError('User not authenticated. Please log in again.');
+        setLoading(false);
+        return;
+      }
+  
+      const formData = new FormData();
+      formData.append('image', {
+        uri: imageUri,
+        name: 'event_image.jpg',
+        type: 'image/jpeg',
+      });
+      formData.append('description', description);
+      formData.append('user_id', userId); 
+      if (selectedUser) formData.append('tag_user_id', selectedUser);
+  
       const response = await axiosInstance.post(`/bars/${event.bar_id}/events/${eventId}/images`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+  
       if (response.status === 201) {
         setSuccess('Image uploaded successfully!');
         setTimeout(() => navigation.navigate('EventsGallery', { eventId }), 1500);
       }
     } catch (err) {
       setError('Error uploading image. Please try again.');
-      console.error('Upload error:', err);
+      console.error('Upload error:', err.response?.data || err);
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <View style={styles.container}>
