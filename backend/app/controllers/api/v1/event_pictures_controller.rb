@@ -1,13 +1,15 @@
 class API::V1::EventPicturesController < ApplicationController
-  before_action :set_event
+  before_action :set_event, only: [:create, :show_images, :tag_user, :show] 
   before_action :set_event_picture, only: [:show, :tag_user]
 
   def index
-    pictures = @event.event_pictures.map do |picture|
+    pictures = EventPicture.all.map do |picture|
       {
         id: picture.id,
         url: url_for(picture.picture),
-        thumbnail_url: url_for(picture.picture.variant(resize: "100x100")) 
+        user_id: picture.user.id,
+        event_id: picture.event.id,
+        thumbnail_url: url_for(picture.picture.variant(resize: "100x100"))
       }
     end
 
@@ -35,6 +37,17 @@ class API::V1::EventPicturesController < ApplicationController
     event_picture = @event.event_pictures.new(picture: event_picture_params[:image], user: user)
 
     if event_picture.save
+      event_data = {
+        id: @event.id,
+        name: @event.name,
+        description: @event.description,
+        user_id: user.id,
+        handle: user.handle,
+        created_at: @event.created_at,
+        type: 'event',
+      }
+
+      ActionCable.server.broadcast('feed_channel', event_data)
       render json: { message: 'Image uploaded successfully' }, status: :created
     else
       Rails.logger.error("Failed to save event picture: #{event_picture.errors.full_messages}")

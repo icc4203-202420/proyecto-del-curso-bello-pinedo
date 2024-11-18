@@ -55,8 +55,8 @@ function BarSearch() {
       onPress={() => navigation.navigate('BarDetails', { barId: item.id })}
     >
       <Text style={styles.barName}>{item.name}</Text>
-      <Text style={styles.barLatitude}>Latitude: {item.latitude.toFixed(2)}</Text>
-      <Text style={styles.barLongitude}>Longitude: {item.longitude.toFixed(2)}</Text>
+      |<Text style={styles.barLatitude}>Address: {item.address.line1} {item.address.line2}</Text>
+      |<Text style={styles.barLongitude}>City: {item.address.city}, {item.address.country.name}</Text>
     </TouchableOpacity>
   );
 

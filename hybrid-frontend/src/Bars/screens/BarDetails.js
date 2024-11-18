@@ -64,7 +64,7 @@ function BarDetails() {
           <Text style={styles.details}>Longitude: {bar.longitude ? bar.longitude.toFixed(6) : 'No disponible'}</Text>
           <Text style={styles.details}>Address: {bar.address.line1} {bar.address.line2}</Text>
           <Text style={styles.details}>City: {bar.address.city}</Text>
-          <Text style={styles.details}>Counry: {bar.address.country.name}</Text>
+          <Text style={styles.details}>Country: {bar.address.country.name}</Text>
         </View>
       </ScrollView>
       <Footer />

@@ -1,28 +1,23 @@
 import React, { createContext, useEffect, useState } from 'react';
 import axiosInstance from '../PageElements/axiosInstance';
 import * as SecureStore from 'expo-secure-store';
-import useWebSocket from 'react-use-websocket';
+import { createConsumer } from '@rails/actioncable';
 import config from '../config/config';
 
 export const FeedContext = createContext();
 
 export const FeedProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
+  const [events, setEvents] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [friends, setFriends] = useState([]);
   const [bars, setBars] = useState([]);
   const [filter, setFilter] = useState(null);
 
-  const { lastMessage, sendMessage } = useWebSocket(config.WS_BASE_URL, {
-    onOpen: () => console.log('Connected to WebSocket'),
-    onClose: () => console.log('Disconnected from WebSocket'),
-    shouldReconnect: () => true,
-  });
-
   useEffect(() => {
     const loadFeedData = async () => {
       try {
-        // Obtener el usuario actual desde SecureStore
+        // Get the current user from SecureStore
         const storedUser = await SecureStore.getItemAsync('user');
         if (!storedUser) {
           console.error('No user data found in storage.');
@@ -31,17 +26,17 @@ export const FeedProvider = ({ children }) => {
         const user = JSON.parse(storedUser);
         setCurrentUserId(user.id);
 
-        // Obtener amistades
+        // Fetch friendships
         console.log(`Fetching friendships for user ${user.id}...`);
         const friendshipsResponse = await axiosInstance.get('/friendships', {
           params: { user_id: user.id },
         });
 
         const friendships = friendshipsResponse.data.friendships;
-        setFriends(friendships); // Guarda toda la información de amigos
+        setFriends(friendships); // Save all friend information
         const friendIds = friendships.map((friendship) => friendship.friend_id);
 
-        // Obtener y filtrar reseñas
+        // Fetch and filter reviews
         console.log('Fetching all reviews...');
         const reviewsResponse = await axiosInstance.get('/reviews');
         const allReviews = reviewsResponse.data.reviews;
@@ -59,7 +54,22 @@ export const FeedProvider = ({ children }) => {
         console.log('Filtered reviews:', filteredReviews);
         setReviews(filteredReviews);
 
-        // Obtener bares
+        const eventResponse = await axiosInstance.get('/event_pictures');
+        const allEvents = eventResponse.data.images;
+
+        const filteredEvents = await Promise.all(
+          allEvents
+            .filter((event) => friendIds.includes(event.user_id))
+            .map(async (event) => {
+              const userName = await fetchUserName(event.user_id);
+              return { ...event, userName };
+            })
+        );
+
+        console.log('Filtered events:', filteredEvents);
+        setEvents(filteredEvents);
+
+        // Fetch bars
         console.log('Fetching all bars...');
         const barsResponse = await axiosInstance.get('/bars');
         setBars(barsResponse.data.bars);
@@ -72,28 +82,23 @@ export const FeedProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (lastMessage !== null) {
-      try {
-        const data = JSON.parse(lastMessage.data);
+    const setupSubscription = async () => {
+      const consumer = createConsumer(config.WS_BASE_URL);
 
-        if (data.type === 'ping') return;
+      const subscription = consumer.subscriptions.create('FeedChannel', {
+        received(data) {
+          console.log("New live feed update:", data);
+          setReviews((prevReviews) => [data, ...prevReviews]);
+        },
+      });
 
-        if (data.message && data.message.review) {
-          const newReview = data.message.review;
+      return () => {
+        subscription.unsubscribe();
+      };
+    };
 
-          fetchUserName(newReview.user_id).then((userName) => {
-            fetchBeerName(newReview.beer_id).then((beerName) => {
-              const updatedReview = { ...newReview, userName, beerName };
-
-              setReviews((prevReviews) => [updatedReview, ...prevReviews]);
-            });
-          });
-        }
-      } catch (error) {
-        console.error('Error processing WebSocket message:', error);
-      }
-    }
-  }, [lastMessage]);
+    setupSubscription();
+  }, [setReviews]);
 
   const fetchUserName = async (userId) => {
     try {
@@ -102,25 +107,25 @@ export const FeedProvider = ({ children }) => {
       return `${first_name} ${last_name}`;
     } catch (error) {
       console.error(`Error fetching user ${userId}:`, error);
-      return 'Usuario desconocido';
+      return 'Unknown User';
     }
   };
 
   const fetchBeerName = async (beerId) => {
     try {
       const response = await axiosInstance.get(`/beers/${beerId}`);
-      return response.data.name || 'Cerveza desconocida';
+      return response.data.name || 'Unknown Beer';
     } catch (error) {
       console.error(`Error fetching beer ${beerId}:`, error);
-      return 'Cerveza desconocida';
+      return 'Unknown Beer';
     }
   };
 
   const filteredReviews = reviews.filter((review) => {
-    if (!filter) return true; // Sin filtro, muestra todo
+    if (!filter) return true; // No filter, show all
     switch (filter.type) {
       case 'friend':
-        return review.user_id === filter.value; // Filtra por ID de amigo
+        return review.user_id === filter.value; // Filter by friend ID
       case 'bar':
         return review.bar_name === filter.value;
       case 'country':
@@ -132,13 +137,25 @@ export const FeedProvider = ({ children }) => {
     }
   });
 
+  const filteredEvents = events.filter((event) => {
+    if (!filter) return true; // No filter, show all
+    switch (filter.type) {
+      case 'friend':
+        return event.user_id === event.value; // Filter by friend ID
+      default:
+        return true;
+    }
+  });
+
   return (
     <FeedContext.Provider
       value={{
         reviews: filteredReviews,
+        events: filteredEvents,
         friends,
         bars,
         setFilter,
+        setReviews, // Ensure setReviews is provided in the context
       }}
     >
       {children}

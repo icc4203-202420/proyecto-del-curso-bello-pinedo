@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~4.0.0",
     "@notifee/react-native": "^9.1.2",
+    "@rails/actioncable": "^8.0.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/slider": "4.5.5",
     "@react-native-firebase/app": "^21.3.0",
@@ -20,6 +21,7 @@
     "@react-navigation/native-stack": "^6.11.0",
     "@react-navigation/stack": "^6.4.1",
     "@types/react": "~18.3.12",
+    "actioncable": "^5.2.8-1",
     "axios": "^1.7.7",
     "expo": "^52.0.6",
     "expo-av": "~15.0.1",
@@ -34,6 +36,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.1",
+    "react-native-actioncable": "^0.0.3",
     "react-native-dotenv": "^3.4.11",
     "react-native-image-picker": "^7.1.2",
     "react-native-ratings": "^8.1.0",

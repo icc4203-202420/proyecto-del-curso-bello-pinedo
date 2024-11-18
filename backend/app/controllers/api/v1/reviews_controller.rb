@@ -19,7 +19,19 @@ class API::V1::ReviewsController < ApplicationController
   def create
     @review = @user.reviews.build(review_params)
     if @review.save
-      render json: @review, status: :created, location: api_v1_review_url(@review)
+      review_data = {
+      id: @review.id,
+      text: @review.text,
+      rating: @review.rating,
+      beer_id: @review.beer_id,
+      beerName: @review.beer.name,
+      userName: @review.user.handle,
+      created_at: @review.created_at,
+      type: 'review'
+    }
+    
+    ActionCable.server.broadcast('feed_channel', review_data)
+    render json: @review, status: :created, location: api_v1_review_url(@review)
     else
       render json: @review.errors, status: :unprocessable_entity
     end

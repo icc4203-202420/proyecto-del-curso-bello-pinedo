@@ -88,7 +88,7 @@ function SignIn({ navigation }) {
       {loading ? (
         <ActivityIndicator size="large" color="#f5c000" />
       ) : (
-        <Button title="Sign In" onPress={handleSignIn} />
+        <Button title="Sign In" color={'#f5c000'} onPress={handleSignIn} />
       )}
       <Text style={styles.signUpText}>
         Don't have an account?{' '}

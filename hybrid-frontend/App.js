@@ -1,4 +1,13 @@
 // App.js
+
+if (typeof global.addEventListener !== "function") {
+  global.addEventListener = () => {};
+}
+
+if (typeof global.removeEventListener !== "function") {
+  global.removeEventListener = () => {};
+}
+
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image, SafeAreaView, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";

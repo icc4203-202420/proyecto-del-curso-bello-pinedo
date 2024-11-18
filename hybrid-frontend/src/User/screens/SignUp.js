@@ -130,7 +130,7 @@ function SignUp({ navigation }) {
       {loading ? (
         <ActivityIndicator size="large" color="#f5c000" />
       ) : (
-        <Button title="Sign Up" onPress={handleSignUp} />
+        <Button title="Sign Up" color={'#f5c000'} onPress={handleSignUp} />
       )}
       <Text style={styles.signUpText}>
         Already have an account?{' '}
