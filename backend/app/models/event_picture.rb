@@ -21,6 +21,7 @@ class EventPicture < ApplicationRecord
       id: id,
       event_id: event_id,
       bar_id: event.bar_id,
+      barName: event.bar.name,
       name: event.name,
       description: event.description,
       user_id: user_id,
@@ -28,6 +29,8 @@ class EventPicture < ApplicationRecord
       url: Rails.application.routes.url_helpers.rails_blob_url(picture, only_path: true),
       thumbnail_url: Rails.application.routes.url_helpers.rails_representation_url(thumbnail, only_path: true),
       created_at: created_at,
+      country_id: event.bar.address.country.id,
+      countryName: event.bar.address.country.name,
       type: 'event'
     }
   end
