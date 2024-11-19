@@ -127,7 +127,7 @@ function EventPictureUpload() {
   
       if (response.status === 201) {
         setSuccess('Image uploaded successfully!');
-        setTimeout(() => navigation.navigate('EventsGallery', { eventId }), 1500);
+        setTimeout(() => navigation.navigate('EventsGallery', { eventId: eventId, barId: event.bar_id }), 1500);
       }
     } catch (err) {
       setError('Error uploading image. Please try again.');

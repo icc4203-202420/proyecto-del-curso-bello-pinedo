@@ -15,7 +15,7 @@ function reviewsReducer(state, action) {
     case 'ERROR':
       return { ...state, loading: false, error: action.payload, success: '' };
     case 'SUBMIT_SUCCESS':
-      return { ...state, loading: false, reviews: [...state.reviews, action.payload], success: 'Review submitted successfully!', error: '' };
+      return { ...state, loading: false, success: 'Review submitted successfully!', error: '' };
     default:
       return state;
   }
@@ -151,7 +151,11 @@ function BeerDetails() {
             type: 'ERROR',
             payload: 'Error submitting the review. Please try again.',
           });
-        });
+        })
+        .finally(() => {
+          fetchReviews();
+        }
+      );
     } else {
       setError('User not found. Please log in.');
     }

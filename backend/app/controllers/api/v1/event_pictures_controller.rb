@@ -38,6 +38,28 @@ class API::V1::EventPicturesController < ApplicationController
     end
   end  
 
+  def by_user
+    user_id = params[:user_id]
+    pictures = EventPicture.where(user_id: user_id).map do |picture|
+      {
+        id: picture.id,
+        event_id: picture.event.id,
+        bar_id: picture.event.bar_id,
+        name: picture.event.name,
+        description: picture.event.description,
+        user_id: picture.user.id,
+        userName: picture.user.handle,
+        tags: picture.tagged_users.pluck(:id),
+        url: url_for(picture.picture),
+        thumbnail_url: url_for(picture.picture.variant(resize: "100x100")),
+        created_at: picture.created_at,
+        type: 'event'
+      }
+    end
+
+    render json: { images: pictures }, status: :ok
+  end
+
   def show_images
     pictures = @event.event_pictures.map do |picture|
       {

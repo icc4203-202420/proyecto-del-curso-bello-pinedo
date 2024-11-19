@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import axiosInstance from '../../PageElements/axiosInstance';
 import * as SecureStore from 'expo-secure-store';
+import { FeedContext } from '../../contexts/FeedContext';
 
 function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const { handleLogindata } = useContext(FeedContext);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,7 +55,9 @@ function SignIn({ navigation }) {
   
       // Save user data to SecureStore
       await SecureStore.setItemAsync('user', JSON.stringify(userData));
-      console.log('User data saved:', userData);  // Debugging log
+      console.log('User data saved:', userData);
+        // Debugging log
+      handleLogindata();
   
       Alert.alert('Success', 'Logged in successfully!');
       navigation.navigate('Feed');  // Navigate to home screen

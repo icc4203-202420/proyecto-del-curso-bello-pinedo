@@ -10,62 +10,90 @@ export const FeedProvider = ({ children }) => {
   const [feedData, setFeedData] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [friends, setFriends] = useState([]);
+  const [bars, setBars] = useState([]);
+  const [beers, setBeers] = useState([]);
   const [subscription, setSubscription] = useState(null);
 
+  const setupFeedData = async () => {
+    const storedUser = await SecureStore.getItemAsync('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setCurrentUser(user);
+      const response = await axiosInstance.get(`/friendships`, {
+        params: { user_id: user.id },
+      });
+      const response2 = await axiosInstance.get(`/bars`);
+      const response3 = await axiosInstance.get(`/beers`);
+
+      setBeers(response3.data);
+      setBars(response2.data);
+      setFriends(response.data);
+    }
+  };
+
   useEffect(() => {
-    const setupFeedData = async () => {
-      const storedUser = await SecureStore.getItemAsync('user');
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        setCurrentUser(user);
-        const response = await axiosInstance.get(`/friendships`, {
-          params: { user_id: user.id },
-        });
-        setFriends(response.data);
-      }
-    };
-  
     setupFeedData();
   }, []);
 
-  useEffect(() => {
-    const setupSubscription = async () => {
-      const storedUser = await SecureStore.getItemAsync('user');
-      if (storedUser) {
-        const consumer = createConsumer(config.WS_BASE_URL);
+  const addFriend = async (friendId, selectedEvent) => {
+    const storedUser = await SecureStore.getItemAsync('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      await axiosInstance.post(`/friendships`, {
+        user_id: user.id,
+        friend_id: friendId,
+        event_id: selectedEvent,
+      });
+      setupFeedData();
+    }
+  };
 
-        const subscription = consumer.subscriptions.create('FeedChannel', {
-          received(data) {
-            console.log("New live feed update:", data);
-            setFeedData((prevFeedData) => {
-              const friendIds = friends.map((friendship) => friendship.friend_id);
-              if (friendIds.includes(data.user_id)) {
-                return [data, ...prevFeedData];
-              }
-              return prevFeedData;
-            });
-          },
-        });
+  const removeFriend = async (friendshipId) => {
+    const storedUser = await SecureStore.getItemAsync('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      await axiosInstance.delete(`/friendships/${friendshipId}`);
+      setupFeedData();
+    }
+  };
 
-        setSubscription(subscription);
-      }
-    };
-
-    setupSubscription();
-
-    return () => {
+  const handleLogout = async () => {
+    try {
       if (subscription) {
         subscription.unsubscribe();
+        setSubscription(null);
       }
-    };
-  }, [friends]);
+      setFriends([]);
+      setBars([]);
+      setBeers([]);
+      setFeedData([]);
+      setCurrentUser(null);
+
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  const handleLogindata = async () => {
+    try {
+      await setupFeedData();
+    } catch (error) {
+      console.error('Error removing user data:', error);
+    }
+  }
 
   return (
     <FeedContext.Provider
       value={{
         feedData,
         friends,
+        bars,
+        beers,
         setFeedData,
+        addFriend,
+        removeFriend,
+        handleLogout,
+        handleLogindata,
         unsubscribe: () => {
           if (subscription) {
             subscription.unsubscribe();

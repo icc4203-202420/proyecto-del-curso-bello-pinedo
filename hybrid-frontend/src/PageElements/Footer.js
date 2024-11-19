@@ -7,15 +7,16 @@ import { FeedContext } from "../contexts/FeedContext";
 
 function Footer() {
     const navigation = useNavigation(); 
-    const { unsubscribe } = useContext(FeedContext);
-    const handleLogout = async () => {
-        try {
-            await AsyncStorage.removeItem('user'); 
-            unsubscribe();
-            navigation.navigate('SignIn');
-        } catch (error) {
-            console.error('Error removing user data:', error);
-        } 
+    const { handleLogout } = useContext(FeedContext);
+    
+    const handleLogoutPress = async () => {
+      try {
+        await AsyncStorage.removeItem('user');
+        handleLogout();
+        navigation.navigate('SignIn');
+      } catch (error) {
+        console.error('Error removing user data:', error);
+      }
     };
 
     return (
@@ -36,7 +37,7 @@ function Footer() {
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('FriendSearch')}>
             <Icon name="user" size={24} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton} onPress={handleLogout}>
+          <TouchableOpacity style={styles.footerButton} onPress={handleLogoutPress}>
             <Icon name="sign-out" size={24} color="#000" />
           </TouchableOpacity>
         </View>

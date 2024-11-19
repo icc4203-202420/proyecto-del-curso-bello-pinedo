@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import axiosInstance from '../../PageElements/axiosInstance';
 import Footer from '../../PageElements/Footer';
 import { Picker } from '@react-native-picker/picker';
 import * as SecureStore from 'expo-secure-store';
+import { FeedContext } from '../../contexts/FeedContext';
 
 function FriendDetails() {
   const [user, setUser] = useState(null);
@@ -15,6 +16,7 @@ function FriendDetails() {
   const [error, setError] = useState('');
   const [friendship, setFriendship] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const { addFriend, removeFriend } = useContext(FeedContext);
   const { id } = useRoute().params;
   const navigation = useNavigation();
 
@@ -82,7 +84,7 @@ function FriendDetails() {
   };
 
   const handleAdd = () => {
-    axiosInstance.post(`/friendships`, { user_id: currentUser.id, friend_id: id, event_id: selectedEvent })
+    addFriend(id, selectedEvent)
       .then(() => {
         setError('');
       })
@@ -95,7 +97,7 @@ function FriendDetails() {
   };
 
   const handleRemove = () => {
-    axiosInstance.delete(`/friendships/${friendship.id}`)
+    removeFriend(friendship.id)
       .then(() => {
         setError('');
       })
@@ -105,7 +107,7 @@ function FriendDetails() {
       .finally(() => {
         setRefresh(refresh => !refresh);
       });
-  }
+  };
   
   if (!user) {
     return (

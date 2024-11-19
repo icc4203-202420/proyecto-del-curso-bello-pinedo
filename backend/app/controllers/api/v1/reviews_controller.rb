@@ -4,8 +4,20 @@ class API::V1::ReviewsController < ApplicationController
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
-    @reviews = Review.all
-    render json: { reviews: @reviews }, status: :ok
+    @reviews = Review.includes(:user).all
+    reviews_with_handles = @reviews.map do |review|
+      {
+        id: review.id,
+        text: review.text,
+        rating: review.rating,
+        created_at: review.created_at,
+        updated_at: review.updated_at,
+        user_id: review.user_id,
+        beer_id: review.beer_id,
+        user_handle: review.user.handle
+      }
+    end
+    render json: { reviews: reviews_with_handles }, status: :ok
   end
 
   def show
@@ -36,6 +48,25 @@ class API::V1::ReviewsController < ApplicationController
     else
       render json: @review.errors, status: :unprocessable_entity
     end
+  end
+
+  def by_user
+    user_id = params[:user_id]
+    reviews = Review.where(user_id: user_id)
+    reviews_with_handles = reviews.map do |review|
+      {
+        id: review.id,
+        text: review.text,
+        rating: review.rating,
+        beerName: review.beer.name,
+        beer_id: review.beer_id,
+        user_id: review.user_id,
+        userName: review.user.handle,
+        created_at: review.created_at,
+        type: 'review'
+      }
+    end
+    render json: { reviews: reviews_with_handles }, status: :ok
   end
 
   def update

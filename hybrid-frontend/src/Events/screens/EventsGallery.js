@@ -56,7 +56,7 @@ function EventsGallery() {
   };
 
   const handleImageClick = (id) => {
-    navigation.navigate('EventsPictureDetails', { barId, eventId, pictureId: id });
+    navigation.navigate('EventsPictureDetails', { barId: barId, eventId: eventId, pictureId: id });
   };
 
   return (

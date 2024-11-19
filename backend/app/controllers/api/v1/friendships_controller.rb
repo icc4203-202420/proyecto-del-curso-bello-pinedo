@@ -3,8 +3,20 @@ class API::V1::FriendshipsController < ApplicationController
   before_action :set_user, only: [:index, :create]
 
   def index
-    @friends = Friendship.where(user_id: params[:user_id])
-    render json: { friendships: @friends }, status: :ok
+    @friends = Friendship.where(user_id: params[:user_id]).includes(:friend)
+    friends_with_handles = @friends.map do |friendship|
+      {
+        id: friendship.id,
+        friend_id: friendship.friend_id,
+        user_id: friendship.user_id,
+        bar_id: friendship.bar_id,
+        event_id: friendship.event_id,
+        created_at: friendship.created_at,
+        updated_at: friendship.updated_at,
+        friend_handle: friendship.friend.handle
+      }
+    end
+    render json: { friendships: friends_with_handles }, status: :ok
   end
 
   def create

@@ -41,7 +41,19 @@ Rails.application.routes.draw do
       resources :events do
         resources :attendances, only: [:index, :show], action: 'indexAttendances'
       end
-      
+
+      resources :reviews do
+        collection do
+          get 'by_user/:user_id', to: 'reviews#by_user'
+        end
+      end
+
+      resources :event_pictures do
+        collection do
+          get 'by_user/:user_id', to: 'event_pictures#by_user'
+        end
+      end
+  
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
       resources :events
       resources :event_pictures
