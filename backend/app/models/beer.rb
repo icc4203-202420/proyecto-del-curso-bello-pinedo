@@ -4,6 +4,7 @@ class Beer < ApplicationRecord
   has_many :breweries, through: :brand
   has_many :reviews, dependent: :destroy
   has_many :users, through: :reviews
+  has_many :user_reviews, dependent: :destroy
   has_one_attached :image
 
   has_many :bars_beers

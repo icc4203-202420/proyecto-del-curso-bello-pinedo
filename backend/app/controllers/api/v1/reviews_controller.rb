@@ -1,11 +1,23 @@
 class API::V1::ReviewsController < ApplicationController
   respond_to :json
-  before_action :set_user, only: [:index, :create]
+  before_action :set_user, only: [ :create]
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
-    @reviews = Review.where(user: @user)
-    render json: { reviews: @reviews }, status: :ok
+    @reviews = Review.includes(:user).all
+    reviews_with_handles = @reviews.map do |review|
+      {
+        id: review.id,
+        text: review.text,
+        rating: review.rating,
+        created_at: review.created_at,
+        updated_at: review.updated_at,
+        user_id: review.user_id,
+        beer_id: review.beer_id,
+        user_handle: review.user.handle
+      }
+    end
+    render json: { reviews: reviews_with_handles }, status: :ok
   end
 
   def show
@@ -19,10 +31,43 @@ class API::V1::ReviewsController < ApplicationController
   def create
     @review = @user.reviews.build(review_params)
     if @review.save
-      render json: @review, status: :created, location: api_v1_review_url(@review)
+      review_data = {
+      id: @review.id,
+      text: @review.text,
+      rating: @review.rating,
+      beer_id: @review.beer_id,
+      user_id: @review.user_id,
+      beerName: @review.beer.name,
+      userName: @review.user.handle,
+      created_at: @review.created_at,
+      type: 'review'
+    }
+    
+    ActionCable.server.broadcast('feed_channel', review_data)
+    notify_friends(@review)
+    render json: @review, status: :created, location: api_v1_review_url(@review)
     else
       render json: @review.errors, status: :unprocessable_entity
     end
+  end
+
+  def by_user
+    user_id = params[:user_id]
+    reviews = Review.where(user_id: user_id)
+    reviews_with_handles = reviews.map do |review|
+      {
+        id: review.id,
+        text: review.text,
+        rating: review.rating,
+        beerName: review.beer.name,
+        beer_id: review.beer_id,
+        user_id: review.user_id,
+        userName: review.user.handle,
+        created_at: review.created_at,
+        type: 'review'
+      }
+    end
+    render json: { reviews: reviews_with_handles }, status: :ok
   end
 
   def update
@@ -43,6 +88,28 @@ class API::V1::ReviewsController < ApplicationController
   def set_review
     @review = Review.find_by(id: params[:id])
     render json: { error: "Review not found" }, status: :not_found unless @review
+  end
+
+  def notify_friends(review)
+    friends = review.user.friends # Ajusta esto según cómo manejas las relaciones de amigos en tu modelo User
+
+    friends.each do |friend|
+      notification = Notification.create(
+        user: friend,
+        sender: review.user,
+        notification_type: 'new_review',
+        message: "#{review.user.name} ha dejado una nueva reseña sobre #{review.beer.name}",
+        read: false
+      )
+
+      # Transmitir notificación en tiempo real usando ActionCable
+      NotificationsChannel.broadcast_to(friend, {
+        id: notification.id,
+        message: notification.message,
+        read: notification.read,
+        created_at: notification.created_at
+      })
+    end
   end
 
   def set_user

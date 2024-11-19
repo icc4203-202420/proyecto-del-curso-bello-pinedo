@@ -7,18 +7,18 @@ class API::V1::BarsController < ApplicationController
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   def index
-    @bars = Bar.all
-    render json: { bars: @bars }, status: :ok
+    @bars = Bar.includes(address: :country).all
+    render json: @bars.as_json(include: { address: { include: :country } }), status: :ok
   end
 
   def show
     if @bar.image.attached?
-      render json: @bar.as_json.merge({ 
+      render json: @bar.as_json(include: { address: { include:  :country } }).merge({ 
         image_url: url_for(@bar.image), 
         thumbnail_url: url_for(@bar.thumbnail) }),
         status: :ok
     else
-      render json: { bar: @bar.as_json }, status: :ok
+      render json: @bar.as_json(include: { address: { include:  :country } }), status: :ok
     end
   end
 
@@ -62,7 +62,7 @@ class API::V1::BarsController < ApplicationController
 
   def bar_params
     params.require(:bar).permit(
-      :name, :latitude, :longitude, :image_base64,
+      :name, :latitude, :longitude, :image_base64, :address_id,
       address_attributes: [:user_id, :line1, :line2, :city, country_attributes: [:name]]
     )
   end

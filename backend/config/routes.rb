@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
-  # devise_for :users
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   get 'current_user', to: 'current_user#index'
+  
   devise_for :users, path: '', path_names: {
     sign_in: 'api/v1/login',
     sign_out: 'api/v1/logout',
@@ -16,21 +15,51 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  mount ActionCable.server => '/cable'
   # Defines the root path route ("/")
   # root "posts#index"
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :bars
-      resources :beers
-      resources :events
-      resources :users do
-        resources :reviews, only: [:index]
-        resources :friendships
+      resources :bars do
+        resources :events do
+          post 'generate_summary', on: :member
+          get 'images_by_event', to: 'event_pictures#images_by_event'
+          resources :images, only: [:create, :index, :show], controller: 'event_pictures' do
+            post 'tag_user', on: :member  # Ruta personalizada para etiquetar usuarios en una imagen específica
+          end
+        end
       end
-      
+      resources :beers do
+        member do
+          get :bars 
+        end
+      end
+      resources :users do
+        resources :reviews, only: [:index, :create, :update, :destroy]
+      end
+      resources :events do
+        resources :attendances, only: [:index, :show], action: 'indexAttendances'
+      end
+
+      resources :reviews do
+        collection do
+          get 'by_user/:user_id', to: 'reviews#by_user'
+        end
+      end
+
+      resources :event_pictures do
+        collection do
+          get 'by_user/:user_id', to: 'event_pictures#by_user'
+        end
+      end
+  
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
+      resources :events
+      resources :event_pictures
+      resources :countries
+      resources :attendances, only: [:index, :show, :create, :update, :destroy]
+      resources :friendships, only: [:create, :destroy, :index, :show]
     end
   end
-
 end

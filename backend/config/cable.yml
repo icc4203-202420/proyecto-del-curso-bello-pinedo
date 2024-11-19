@@ -1,6 +1,13 @@
 development:
   adapter: async
 
+  # Permitir conexiones desde cualquier dominio (para ngrok)
+  allowed_request_origins:
+    - http://localhost:3000
+    - http://127.0.0.1:3000
+    - <%= ENV['NGROK_URL'] %>
+
+
 test:
   adapter: test
 
