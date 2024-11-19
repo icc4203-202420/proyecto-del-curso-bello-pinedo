@@ -20,23 +20,42 @@ import BeerDetails from "./src/Beers/screens/BeersDetails";
 import SignIn from "./src/User/screens/SignIn";
 import SignUp from "./src/User/screens/SignUp";
 import { FeedProvider } from "./src/contexts/FeedContext";  
+import NotificationListener from "./src/PageElements/NotificationListener";
 
 const Stack = createNativeStackNavigator();
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState([]);
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => {
+    registerForPushNotificationsAsync().then((token) => {
       setExpoPushToken(token);
     });
 
-    const notificationListener = Notifications.addNotificationReceivedListener(notification => {
-      Alert.alert('Notification Received', notification.request.content.body);
+    const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
+      setNotification(notification);
+      Alert.alert(
+        "New Notification",
+        notification.request.content.body || "You have a new notification!"
+      );
+    });
+
+    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log("Notification clicked:", response);
     });
 
     return () => {
-      notificationListener.remove();
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
     };
   }, []);
 
@@ -67,21 +86,27 @@ function App() {
 }
 
 async function registerForPushNotificationsAsync() {
-  const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-  let finalStatus = existingStatus;
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
 
-  if (existingStatus !== 'granted') {
-    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-    finalStatus = status;
-  }
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
 
-  if (finalStatus !== 'granted') {
-    Alert.alert('Permission Denied', 'You will not receive notifications.');
+    if (finalStatus !== "granted") {
+      Alert.alert("Permission Denied", "You will not receive notifications.");
+      return;
+    }
+
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log("Expo Push Token:", token);
+    return token;
+  } else {
+    Alert.alert("Error", "Must use a physical device for Push Notifications.");
     return;
   }
-
-  const token = (await Notifications.getExpoPushTokenAsync()).data;
-  return token;
 }
 
 const styles = StyleSheet.create({

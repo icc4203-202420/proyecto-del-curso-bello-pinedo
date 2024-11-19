@@ -44,6 +44,7 @@ class API::V1::ReviewsController < ApplicationController
     }
     
     ActionCable.server.broadcast('feed_channel', review_data)
+    notify_friends(@review)
     render json: @review, status: :created, location: api_v1_review_url(@review)
     else
       render json: @review.errors, status: :unprocessable_entity
@@ -87,6 +88,28 @@ class API::V1::ReviewsController < ApplicationController
   def set_review
     @review = Review.find_by(id: params[:id])
     render json: { error: "Review not found" }, status: :not_found unless @review
+  end
+
+  def notify_friends(review)
+    friends = review.user.friends # Ajusta esto según cómo manejas las relaciones de amigos en tu modelo User
+
+    friends.each do |friend|
+      notification = Notification.create(
+        user: friend,
+        sender: review.user,
+        notification_type: 'new_review',
+        message: "#{review.user.name} ha dejado una nueva reseña sobre #{review.beer.name}",
+        read: false
+      )
+
+      # Transmitir notificación en tiempo real usando ActionCable
+      NotificationsChannel.broadcast_to(friend, {
+        id: notification.id,
+        message: notification.message,
+        read: notification.read,
+        created_at: notification.created_at
+      })
+    end
   end
 
   def set_user

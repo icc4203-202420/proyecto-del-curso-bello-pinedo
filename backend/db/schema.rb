@@ -241,8 +241,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_04_231326) do
   add_foreign_key "friendships", "events"
   add_foreign_key "friendships", "users"
   add_foreign_key "friendships", "users", column: "friend_id"
-  add_foreign_key "notifications", "senders"
   add_foreign_key "notifications", "users"
+  add_foreign_key "notifications", "users", column: "sender_id"
   add_foreign_key "reviews", "beers", on_delete: :cascade
   add_foreign_key "reviews", "users"
   add_foreign_key "tags", "event_pictures"
