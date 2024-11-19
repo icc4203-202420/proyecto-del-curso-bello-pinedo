@@ -12,6 +12,7 @@ export const FeedProvider = ({ children }) => {
   const [friends, setFriends] = useState([]);
   const [bars, setBars] = useState([]);
   const [beers, setBeers] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [subscription, setSubscription] = useState(null);
 
   const setupFeedData = async () => {
@@ -24,7 +25,9 @@ export const FeedProvider = ({ children }) => {
       });
       const response2 = await axiosInstance.get(`/bars`);
       const response3 = await axiosInstance.get(`/beers`);
+      const response4 = await axiosInstance.get(`/countries`);
 
+      setCountries(response4.data);
       setBeers(response3.data);
       setBars(response2.data);
       setFriends(response.data);
@@ -89,6 +92,7 @@ export const FeedProvider = ({ children }) => {
         friends,
         bars,
         beers,
+        countries,
         setFeedData,
         addFriend,
         removeFriend,

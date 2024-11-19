@@ -10,12 +10,13 @@ import axiosInstance from '../../PageElements/axiosInstance';
 import { Picker } from '@react-native-picker/picker';
 
 function FeedScreen() {
-  const { feedData, setFeedData, friends = {}, bars, beers } = useContext(FeedContext);
+  const { feedData, setFeedData, friends = {}, bars, beers, countries } = useContext(FeedContext);
   const navigation = useNavigation();
   const [currentUserId, setCurrentUserId] = useState(null);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [selectedBar, setSelectedBar] = useState(null);
   const [selectedBeer, setSelectedBeer] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState(null);
   const [filterType, setFilterType] = useState(null);
   const [filterOptions, setFilterOptions] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -75,11 +76,18 @@ function FeedScreen() {
   const filteredFeedData = useMemo(() => {
     return feedData.filter((item) => {
       if (selectedFriend && item.user_id !== selectedFriend) return false;
-      if (selectedBar && item.type === 'event' && item.bar_id !== selectedBar) return false;
-      if (selectedBeer && item.type === 'review' && item.beer_id !== selectedBeer) return false;
+      if (selectedBar) {
+        return item.type === 'event' && item.bar_id === selectedBar;
+      }
+      if (selectedBeer) {
+        return item.type === 'review' && item.beer_id === selectedBeer;
+      }
+      if (selectedCountry) {
+        return item.type === 'event' && item.country_id === selectedCountry;
+      }
       return true;
     });
-  }, [feedData, selectedFriend, selectedBar, selectedBeer]);
+  }, [feedData, selectedFriend, selectedBar, selectedBeer, selectedCountry]);
 
   const renderItem = ({ item }) => {
     if (item.type === 'event') {
@@ -96,6 +104,7 @@ function FeedScreen() {
           <Text style={styles.boldText}>{item.userName || 'Unknown'}</Text> uploaded on <Text style={styles.boldText}>{item.name || 'Unknown event'}</Text>:
         </Text>
         <Image source={{ uri: item.url }} style={styles.image} />
+        <Text style={styles.reviewRating}>Bar: {item.barName}, {item.countryName}</Text>
         <Text style={styles.reviewDate}>{new Date(item.created_at).toLocaleString()}</Text>
         </TouchableOpacity>
       );
@@ -145,6 +154,12 @@ function FeedScreen() {
           ...beers.map((beer) => ({ label: beer.name, value: beer.id }))
         ]);
         break;
+      case 'country':
+        setFilterOptions([
+          { label: "Select Country", value: null },
+          ...countries.map((country) => ({ label: country.name, value: country.id }))
+        ]);
+        break;
       default:
         setFilterOptions([]);
         break;
@@ -162,6 +177,9 @@ function FeedScreen() {
       case 'beer':
         setSelectedBeer(value);
         break;
+      case 'country':
+        setSelectedCountry(value);
+        break;
       default:
         break;
     }
@@ -172,6 +190,7 @@ function FeedScreen() {
     setSelectedFriend(null);
     setSelectedBar(null);
     setSelectedBeer(null);
+    setSelectedCountry(null);
   };
 
   return (
@@ -188,9 +207,12 @@ function FeedScreen() {
           <View style={styles.buttonWrapper}>
             <Button title="Filter by Beer" color={"#f5c000"} onPress={() => openFilterModal('beer')} />
           </View>
+          <View style={styles.buttonWrapper}>
+            <Button title="Filter by Country" color={"#f5c000"} onPress={() => openFilterModal('country')} />
+          </View>
         </ScrollView>
         </View>
-        {(selectedFriend || selectedBar || selectedBeer) && (
+        {(selectedFriend || selectedBar || selectedBeer || selectedCountry) && (
             <View style={styles.buttonWrapper}>
               <Button title="Remove Filters" color={"#f05d6c"} onPress={removeFilters} />
             </View>
