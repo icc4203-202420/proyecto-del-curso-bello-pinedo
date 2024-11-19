@@ -57,6 +57,7 @@ Rails.application.routes.draw do
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
       resources :events
       resources :event_pictures
+      resources :countries
       resources :attendances, only: [:index, :show, :create, :update, :destroy]
       resources :friendships, only: [:create, :destroy, :index, :show]
     end
