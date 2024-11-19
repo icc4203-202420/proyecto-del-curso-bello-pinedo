@@ -45,6 +45,7 @@ class API::V1::EventPicturesController < ApplicationController
         id: picture.id,
         event_id: picture.event.id,
         bar_id: picture.event.bar_id,
+        barName: picture.event.bar.name,
         name: picture.event.name,
         description: picture.event.description,
         user_id: picture.user.id,
@@ -53,6 +54,8 @@ class API::V1::EventPicturesController < ApplicationController
         url: url_for(picture.picture),
         thumbnail_url: url_for(picture.picture.variant(resize: "100x100")),
         created_at: picture.created_at,
+        country_id: picture.event.bar.address.country.id,
+        countryName: picture.event.bar.address.country.name,
         type: 'event'
       }
     end
