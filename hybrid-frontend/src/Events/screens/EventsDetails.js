@@ -68,7 +68,6 @@ function EventsDetails() {
     axiosInstance.post(`/attendances`, { user_id: currentUser.id, event_id: eventId, checked_in: true })
       .then(() => {
         setCheckInSuccess('You have successfully checked in to the event!');
-        notifyFriends();
       })
       .catch(() => {
         setError('Error checking in to the event. Please try again.');
@@ -90,16 +89,6 @@ function EventsDetails() {
         setRefresh(refresh => !refresh);
       });
   }
-
-  const notifyFriends = () => {
-    axiosInstance.post(`/users/${currentUser.id}/notify-friends`, {
-      event_id: eventId,
-      message: `${currentUser.name} has checked in to the event: ${event.name}`
-    })
-    .catch(() => {
-      console.error('Error notifying friends about check-in.');
-    });
-  };
 
   const handleViewGallery = () => {
     navigation.navigate('EventsGallery', { barId: barId, eventId: eventId });
@@ -138,12 +127,21 @@ function EventsDetails() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         {attendance ? 
+        <>
         <Button
           title={loading ? 'Checking in...' : 'Check Out'}
           color="#f5c000"
           onPress={handleCheckOut}
           disabled={loading}
-        /> : 
+        />
+        <View style={styles.buttonContainer}>
+          <Button
+            title="View Gallery"
+            color="#f5c000"
+            onPress={handleViewGallery}
+          />
+        </View>
+        </> : 
         <Button
           title={loading ? 'Checking in...' : 'Check In'}
           color="#f5c000"
@@ -155,13 +153,7 @@ function EventsDetails() {
         
 
         {/* View Gallery Button */}
-        <View style={styles.buttonContainer}>
-          <Button
-            title="View Gallery"
-            color="#f5c000"
-            onPress={handleViewGallery}
-          />
-        </View>
+        
       </View>
       <Footer />
     </>
